@@ -5,12 +5,21 @@
 #include <iostream>
 #include <string>
 #include "Tree.hpp"
+#include "Complex.hpp"
 
 using namespace std;
 
-int main()
-{
+std::ostream& operator<<(std::ostream& os, const Complex& c) {
+    os << c.real;
+    if (c.imag >= 0) {
+        os << " + " << c.imag << "i";
+    } else {
+        os << " - " << -c.imag << "i";
+    }
+    return os;
+}
 
+void createBinaryTreeWithDoubleValuesAndTraverseTheTree() {
     Node<double,2> root2_node = Node<double,2>(1.1);
     Tree<double,2> tree; // Binary tree that contains doubles.
     tree.add_root(root2_node);
@@ -51,19 +60,31 @@ int main()
         cout << node.get_value() << endl;
     } // prints: 1.4, 1.2, 1.5, 1.1, 1.6, 1.3
     cout << endl;
-    /*
+    
     for (auto node = tree.begin_bfs_scan(); node != tree.end_bfs_scan(); ++node)
     {
-        cout << node->get_value() << endl;
+        cout << node.get_value() << endl;
     } // prints: 1.1, 1.2, 1.3, 1.4, 1.5, 1.6
+    cout << endl;
 
-    for (auto node : tree)
+    for (auto node = tree.begin_dfs_scan(); node != tree.end_dfs_scan(); ++node)
+    {
+        cout << node.get_value() << endl;
+    } // prints: 1.1, 1.2, 1.4, 1.5, 1.3, 1.6
+    cout << endl;
+
+    // min heap
+    for (auto node = tree.myHeap(); node.isNotEmpty(); ++node)
     {
         cout << node.get_value() << endl;
     } // same as BFS: 1.1, 1.2, 1.3, 1.4, 1.5, 1.6
-
+    cout << endl;
+    /*
     cout << tree; // Should print the graph using GUI.
     */   
+}
+
+void createTrinaryTreeWithDoubleValuesAndTraverseTheTree() {
     Node<double,3> root3_node = Node<double,3>(1.1);
     Node<double,3> n1 = Node<double,3>(1.2);
     Node<double,3> n2 = Node<double,3>(1.3);
@@ -142,4 +163,105 @@ int main()
         cout << node.get_value() << endl;
     } // prints: 1.8, 1.4, 1.9, 1.105, 1.2, 1.12, 1.5, 1.13, 1.14, 1.11, 1.1, 1.16, 1.6, 1.17, 1.3, 1.18, 1.15, 1.19, 1.21, 1.205, 1.22, 1.23, 1.7, 1.24, 1.26, 1.25
     cout << endl;     
+    
+    for (auto node = three_ary_tree.begin_bfs_scan(); node != three_ary_tree.end_bfs_scan(); ++node)
+    {
+        cout << node.get_value() << endl;
+    } // prints: 1.1, 1.2, 1.3, 1.7, 1.4, 1.5, 1.11, 1.6, 1.15, 1.23, 1.24, 1.25, 1.8, 1.9, 1.105, 1.12, 1.13, 1.14, 1.16, 1.17, 1.18, 1.19, 1.205, 1.26, 1.21, 1.22
+    cout << endl;  
+    for (auto node = three_ary_tree.begin_dfs_scan(); node != three_ary_tree.end_dfs_scan(); ++node)
+    {
+        cout << node.get_value() << endl;
+    } // prints: 1.1, 1.2, 1.4, 1.8, 1.9, 1.105, 1.5, 1.12, 1.13, 1.11, 1.14, 1.3, 1.6, 1.16, 1.17, 1.15, 1.18, 1.19, 1.205, 1.21, 1.22, 1.7, 1.23, 1.24, 1.25, 1.26
+    cout << endl;
+    for (auto node = three_ary_tree.myHeap(); node.isNotEmpty(); ++node)
+    {
+        cout << node.get_value() << endl;
+    } // prints: 1.1, 1.105, 1.11, 1.12, 1.13, 1.14, 1.15, 1.16, 1.17, 1.18, 1.19, 1.2, 1.205, 1.21, 1.22, 1.23, 1.24, 1.25, 1.26, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9
+    cout << endl;      
+    /*
+    cout << tree; // Should print the graph using GUI.
+    */  
+}
+
+void createBinaryTreeWithComplexValuesAndTraverseTheTree() {
+    Complex c11(1,1);
+    Complex c12(1,2);
+    Complex c13(1,3);
+    Complex c14(1,4);
+    Complex c15(1,5);
+    Complex c16(1,6);
+
+    Node<Complex,2> root2_node = Node<Complex,2>(c11);
+    Tree<Complex,2> tree; // Binary tree that contains Complexs.
+    tree.add_root(root2_node);
+    
+    Node<Complex,2> m1 = Node<Complex,2>(c12);
+    Node<Complex,2> m2 = Node<Complex,2>(c13);
+    Node<Complex,2> m3 = Node<Complex,2>(c14);
+    Node<Complex,2> m4 = Node<Complex,2>(c15);
+    Node<Complex,2> m5 = Node<Complex,2>(c16);
+
+    tree.add_sub_node(root2_node, m1);
+    tree.add_sub_node(root2_node, m2);
+    tree.add_sub_node(m1, m3);
+    tree.add_sub_node(m1, m4);
+    tree.add_sub_node(m2, m5);
+   
+    // The tree should look like:
+    /**
+     *       root = (1,1)
+     *     /           \
+     *    (1,2)         (1,3)
+     *   /    \          /
+     *  (1,4)  (1,5)   (1,6)
+     */
+    
+    for (auto node = tree.begin_pre_order(); node != tree.end_pre_order(); ++node)
+    {
+        cout << node.get_value() << endl;
+    } // prints: 1.1, 1.2, 1.4, 1.5, 1.3, 1.6
+    cout << endl;
+    for (auto node = tree.begin_post_order(); node != tree.end_post_order(); ++node)
+    {
+        cout << node.get_value() << endl;
+    } // prints: 1.4, 1.5, 1.2, 1.6, 1.3, 1.1    
+    cout << endl;
+    
+    for (auto node = tree.begin_in_order(); node != tree.end_in_order(); ++node)
+    {
+        cout << node.get_value() << endl;
+    } // prints: 1.4, 1.2, 1.5, 1.1, 1.6, 1.3
+    cout << endl;
+    
+    for (auto node = tree.begin_bfs_scan(); node != tree.end_bfs_scan(); ++node)
+    {
+        cout << node.get_value() << endl;
+    } // prints: 1.1, 1.2, 1.3, 1.4, 1.5, 1.6
+    cout << endl;
+
+    for (auto node = tree.begin_dfs_scan(); node != tree.end_dfs_scan(); ++node)
+    {
+        cout << node.get_value() << endl;
+    } // prints: 1.1, 1.2, 1.4, 1.5, 1.3, 1.6
+    cout << endl;
+
+    // min heap
+    for (auto node = tree.myHeap(); node.isNotEmpty(); ++node)
+    {
+        cout << node.get_value() << endl;
+    } // same as BFS: 1.1, 1.2, 1.3, 1.4, 1.5, 1.6
+    cout << endl;
+    /*
+    cout << tree; // Should print the graph using GUI.
+    */   
+}
+
+int main()
+{
+    createBinaryTreeWithDoubleValuesAndTraverseTheTree();    
+   
+    createTrinaryTreeWithDoubleValuesAndTraverseTheTree();    
+
+    createBinaryTreeWithComplexValuesAndTraverseTheTree();  
 }

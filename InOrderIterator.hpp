@@ -1,8 +1,9 @@
+// ariel.levovich@msmail.ariel.ac.il 
 #ifndef INORDER_ITERATOR_HPP
 #define INORDER_ITERATOR_HPP
 
 #include "Node.hpp"
-// In-order iterator (only for binary trees)
+// In-order iterator 
 template<typename T, size_t K>
 class InOrderIterator {
 private:

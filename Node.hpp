@@ -1,3 +1,4 @@
+// ariel.levovich@msmail.ariel.ac.il 
 #ifndef NODE_HPP
 #define NODE_HPP
 

@@ -1,3 +1,4 @@
+// ariel.levovich@msmail.ariel.ac.il 
 #ifndef TREE_HPP
 #define TREE_HPP
 
@@ -11,6 +12,9 @@
 #include "PreOrderIterator.hpp"
 #include "PostOrderIterator.hpp"
 #include "InOrderIterator.hpp"
+#include "BfsIterator.hpp"
+#include "DfsIterator.hpp"
+#include "HeapIterator.hpp"
 
 // Tree class with k-ary tree implementation
 template<typename T, size_t K>
@@ -70,119 +74,31 @@ public:
         return InOrderIterator<T,K>(nullptr);
     }
 
-    // BFS iterator
-    /*
-    class BFSIterator {
-    private:
-        std::queue<std::shared_ptr<Node<T,K>>> queue;
-
-    public:
-        explicit BFSIterator(std::shared_ptr<Node<T,K>> root) {
-            if (root) queue.push(root);
-        }
-
-        bool operator!=(const BFSIterator& other) const {
-            return !queue.empty() || !other.queue.empty();
-        }
-
-        T& operator*() const {
-            return queue.front()->value;
-        }
-
-        BFSIterator& operator++() {
-            auto node = queue.front();
-            queue.pop();
-            for (auto& child : node->children) {
-                queue.push(child);
-            }
-            return *this;
-        }
-    };
-
-    BFSIterator begin_bfs_scan() {
-        return BFSIterator(root);
+    BFSIterator<T,K> begin_bfs_scan() {
+        return BFSIterator<T,K>(root);
     }
 
-    BFSIterator end_bfs_scan() {
-        return BFSIterator(nullptr);
+    BFSIterator<T,K> end_bfs_scan() {
+        return BFSIterator<T,K>(nullptr);
     }
 
-    // DFS iterator
-    class DFSIterator {
-    private:
-        std::stack<std::shared_ptr<Node<T,K>>> stack;
-
-    public:
-        explicit DFSIterator(std::shared_ptr<Node<T,K>> root) {
-            if (root) stack.push(root);
-        }
-
-        bool operator!=(const DFSIterator& other) const {
-            return !stack.empty() || !other.stack.empty();
-        }
-
-        T& operator*() const {
-            return stack.top()->value;
-        }
-
-        DFSIterator& operator++() {
-            auto node = stack.top();
-            stack.pop();
-            for (auto it = node->children.rbegin(); it != node->children.rend(); ++it) {
-                stack.push(*it);
-            }
-            return *this;
-        }
-    };
-
-    DFSIterator begin_dfs_scan() {
-        return DFSIterator(root);
+    DFSIterator<T,K> begin_dfs_scan() {
+        return DFSIterator<T,K>(root);
     }
 
-    DFSIterator end_dfs_scan() {
-        return DFSIterator(nullptr);
+    DFSIterator<T,K> end_dfs_scan() {
+        return DFSIterator<T,K>(nullptr);
     }
-
-    // Heap iterator
-    class HeapIterator {
-    private:
-        std::vector<T,K> heap;
-
-    public:
-        explicit HeapIterator(std::shared_ptr<Node<T,K>> root) {
-            build_heap(root);
-            std::make_heap(heap.begin(), heap.end(), std::greater<>());
-        }
-
-        bool operator!=(const HeapIterator& other) const {
-            return !heap.empty();
-        }
-
-        T& operator*() const {
-            return heap.front();
-        }
-
-        HeapIterator& operator++() {
-            std::pop_heap(heap.begin(), heap.end(), std::greater<>());
-            heap.pop_back();
-            return *this;
-        }
-
-    private:
-        void build_heap(std::shared_ptr<Node<T,K>> node) {
-            if (node) {
-                heap.push_back(node->value);
-                for (const auto& child : node->children) {
-                    build_heap(child);
-                }
-            }
-        }
-    };
-
-    HeapIterator myHeap() {
-        return HeapIterator(root);
+    
+    HeapIterator<T,K> myHeap() {
+        return HeapIterator<T,K>(root);
     }    
-*/    
+
+    HeapIterator<T,K> emptyHeap() {
+        std::shared_ptr<Node<T,K>> empty;
+        return HeapIterator<T,K>(empty);
+    }
+        
 private:
     // Helper function to find a node by value
     std::shared_ptr<Node<T,K>> find_node(std::shared_ptr<Node<T,K>> node, const T& value) {
