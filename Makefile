@@ -11,8 +11,7 @@ run: tree
 	./$^
 
 tree: Demo.o 
-	$(CXX) $(CXXFLAGS) $^ -o tree
-	./tree
+	$(CXX) $(CXXFLAGS) $^ -o tree	
 
 test: TestCounter.o Test.o node.o tree.o complex.o
 	$(CXX) $(CXXFLAGS) $^ -o test

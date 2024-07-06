@@ -3,13 +3,13 @@
 
 #include "Node.hpp"
 // In-order iterator (only for binary trees)
-template<typename T>
+template<typename T, size_t K>
 class InOrderIterator {
 private:
-    std::stack<std::shared_ptr<Node<T>>> stack;
-    std::shared_ptr<Node<T>> current;
+    std::stack<std::shared_ptr<Node<T,K>>> stack;
+    std::shared_ptr<Node<T,K>> current;
 
-    void push_left(std::shared_ptr<Node<T>> node) {
+    void push_left(std::shared_ptr<Node<T,K>> node) {
         while (node) {
             stack.push(node);
             auto children = node->get_children();
@@ -18,7 +18,7 @@ private:
     }
 
 public:
-    explicit InOrderIterator(std::shared_ptr<Node<T>> root) {
+    explicit InOrderIterator(std::shared_ptr<Node<T,K>> root) {
         push_left(root);
         current = (stack.empty()) ? nullptr : stack.top();
     }
@@ -37,7 +37,13 @@ public:
             stack.pop();
             auto children = node->get_children();
             if (!children.empty()) {
-                push_left(children.size() > 1 ? children[1] : nullptr);
+                if (children.size() == 1) {
+                    push_left(nullptr);
+                } else {
+                    for (unsigned int i = children.size()-1; i >= 1; i--) {
+                        push_left(children[i]);
+                    }
+                }
             }
             current = (stack.empty()) ? nullptr : stack.top();
         }

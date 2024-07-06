@@ -3,29 +3,52 @@
 
 #include "Node.hpp"
 // Post-order iterator
-template<typename T>
+template<typename T, size_t K>
 class PostOrderIterator {
 private:
-    std::stack<std::shared_ptr<Node<T>>> stack;
-    std::shared_ptr<Node<T>> current;
+    std::stack<std::shared_ptr<Node<T,K>>> stack;
+    std::shared_ptr<Node<T,K>> current;
 
     void advance() {
-        while (!stack.empty() && current == stack.top()) {
-            stack.pop();
-            if (!stack.empty()) {
-                current = stack.top();
-                auto children = current->get_children();
-                if (!children.empty()) {
-                    current = children.back();
+        if (stack.empty()) {
+            current = nullptr;
+            return;
+        }
+
+        auto node = stack.top();
+        stack.pop();                
+
+        bool lastChildWasProcessed = false;
+        if (!stack.empty()) {
+            auto parent = stack.top();
+            auto& siblings = parent->get_children();
+            auto it = std::find(siblings.begin(), siblings.end(), node);
+
+            if (it != siblings.end() && ++it != siblings.end()) {
+                node = *it;
+                while (!node->get_children().empty()) {
+                    stack.push(node);
+                    node = node->get_children().front();
                 }
+                stack.push(node);
             } else {
-                current = nullptr;
+                lastChildWasProcessed = true;    
             }
+        } else {
+            current = nullptr;
+            return;
+        }
+
+        if (lastChildWasProcessed) {
+            // if the last child was processed, process the parent.
+            current = stack.top();
+        } else {
+            current = node;
         }
     }
 
 public:
-    explicit PostOrderIterator(std::shared_ptr<Node<T>> root) {
+    explicit PostOrderIterator(std::shared_ptr<Node<T,K>> root) {
         if (root) {
             stack.push(root);
             while (!stack.empty() && !stack.top()->get_children().empty()) {
@@ -46,10 +69,7 @@ public:
     }
 
     PostOrderIterator& operator++() {
-        if (!stack.empty()) {
-            stack.pop();
-            advance();
-        }
+        advance();        
         return *this;
     }
 };

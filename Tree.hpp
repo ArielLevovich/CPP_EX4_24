@@ -13,15 +13,14 @@
 #include "InOrderIterator.hpp"
 
 // Tree class with k-ary tree implementation
-template<typename T>
+template<typename T, size_t K>
 class Tree {
 private:
-    std::shared_ptr<Node<T>> root;
-    int max_children;
+    std::shared_ptr<Node<T,K>> root;    
 
 public:
     // Constructor for the Tree class
-    explicit Tree(int k = 2) : root(nullptr), max_children(k) {}
+    explicit Tree() : root(nullptr) {}
 
     // Destructor
     ~Tree() {
@@ -35,50 +34,50 @@ public:
     }    
 
     // Function to add the root node
-    void add_root(const Node<T>& node) {
-        root = std::make_shared<Node<T>>(node);
+    void add_root(const Node<T,K>& node) {
+        root = std::make_shared<Node<T,K>>(node);
     }
 
     // Function to add a child node to a given parent node
-    void add_sub_node(Node<T>& parent_node, const Node<T>& child_node) {        
-        auto children = parent_node.get_children();
-        if ((int)children.size() < max_children) {
-            children.push_back(std::make_shared<Node<T>>(child_node));
+    void add_sub_node(Node<T,K>& parent_node, const Node<T,K>& child_node) {    
+        auto tree_node = find_node(root, parent_node.get_value());            
+        if (tree_node) {
+            tree_node->add_child(std::make_shared<Node<T,K>>(child_node));
         }
     }    
     
-    PreOrderIterator<T> begin_pre_order() {
-        return PreOrderIterator<T>(root);
+    PreOrderIterator<T,K> begin_pre_order() {
+        return PreOrderIterator<T,K>(root);
     }
 
-    PreOrderIterator<T> end_pre_order() {
-        return PreOrderIterator<T>(nullptr);
+    PreOrderIterator<T,K> end_pre_order() {
+        return PreOrderIterator<T,K>(nullptr);
     }    
 
-    PostOrderIterator<T> begin_post_order() {
-        return PostOrderIterator<T>(root);
+    PostOrderIterator<T,K> begin_post_order() {
+        return PostOrderIterator<T,K>(root);
     }
 
-    PostOrderIterator<T> end_post_order() {
-        return PostOrderIterator<T>(nullptr);
+    PostOrderIterator<T,K> end_post_order() {
+        return PostOrderIterator<T,K>(nullptr);
     }    
 
-    InOrderIterator<T> begin_in_order() {
-        return InOrderIterator<T>(root);
+    InOrderIterator<T,K> begin_in_order() {
+        return InOrderIterator<T,K>(root);
     }
 
-    InOrderIterator<T> end_in_order() {
-        return InOrderIterator<T>(nullptr);
+    InOrderIterator<T,K> end_in_order() {
+        return InOrderIterator<T,K>(nullptr);
     }
 
     // BFS iterator
     /*
     class BFSIterator {
     private:
-        std::queue<std::shared_ptr<Node<T>>> queue;
+        std::queue<std::shared_ptr<Node<T,K>>> queue;
 
     public:
-        explicit BFSIterator(std::shared_ptr<Node<T>> root) {
+        explicit BFSIterator(std::shared_ptr<Node<T,K>> root) {
             if (root) queue.push(root);
         }
 
@@ -111,10 +110,10 @@ public:
     // DFS iterator
     class DFSIterator {
     private:
-        std::stack<std::shared_ptr<Node<T>>> stack;
+        std::stack<std::shared_ptr<Node<T,K>>> stack;
 
     public:
-        explicit DFSIterator(std::shared_ptr<Node<T>> root) {
+        explicit DFSIterator(std::shared_ptr<Node<T,K>> root) {
             if (root) stack.push(root);
         }
 
@@ -147,10 +146,10 @@ public:
     // Heap iterator
     class HeapIterator {
     private:
-        std::vector<T> heap;
+        std::vector<T,K> heap;
 
     public:
-        explicit HeapIterator(std::shared_ptr<Node<T>> root) {
+        explicit HeapIterator(std::shared_ptr<Node<T,K>> root) {
             build_heap(root);
             std::make_heap(heap.begin(), heap.end(), std::greater<>());
         }
@@ -170,7 +169,7 @@ public:
         }
 
     private:
-        void build_heap(std::shared_ptr<Node<T>> node) {
+        void build_heap(std::shared_ptr<Node<T,K>> node) {
             if (node) {
                 heap.push_back(node->value);
                 for (const auto& child : node->children) {
@@ -186,15 +185,15 @@ public:
 */    
 private:
     // Helper function to find a node by value
-    // std::shared_ptr<Node<T>> find_node(std::shared_ptr<Node<T>> node, const T& value) {
-    //     if (!node) return nullptr;
-    //     if (node->get_value() == value) return node;
-    //     for (auto& child : node->get_children()) {
-    //         auto result = find_node(child, value);
-    //         if (result) return result;
-    //     }
-    //     return nullptr;
-    // }    
+    std::shared_ptr<Node<T,K>> find_node(std::shared_ptr<Node<T,K>> node, const T& value) {
+        if (!node) return nullptr;
+        if (node->get_value() == value) return node;
+        for (auto& child : node->get_children()) {
+            auto result = find_node(child, value);
+            if (result) return result;
+        }
+        return nullptr;
+    }    
 };
 
 #endif

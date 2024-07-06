@@ -4,18 +4,20 @@
 #include "Node.hpp"
 
 // Pre-order iterator
-template<typename T>
+template<typename T, size_t K>
 class PreOrderIterator {
 private:
-    std::stack<std::shared_ptr<Node<T>>> stack;
+    std::stack<std::shared_ptr<Node<T,K>>> stack;
 
 public:
-    explicit PreOrderIterator(std::shared_ptr<Node<T>> root) {
-        if (root) stack.push(root);
+    explicit PreOrderIterator(std::shared_ptr<Node<T,K>> root) {
+        if (root != nullptr) {
+            stack.push(root);
+        }
     }
 
     bool operator!=(const PreOrderIterator& other) const {
-        return !stack.empty() || !other.stack.empty();
+        return !stack.empty() || !other.stack.empty();                
     }
 
     T get_value() const {
@@ -23,13 +25,18 @@ public:
     }
 
     PreOrderIterator& operator++() {
+        if (stack.empty()) {
+            return *this;
+        }
+
         auto node = stack.top();
         stack.pop();
         auto children = node->get_children();
+        
         for (auto it = children.rbegin(); it != children.rend(); ++it) {
             stack.push(*it);
         }
-        return *this;
+        return *this;        
     }
 };
 #endif
