@@ -26,6 +26,10 @@ public:
     // Constructor for the Tree class
     explicit Tree() : root(nullptr) {}
 
+    std::shared_ptr<Node<T,K>> getRoot() const {
+        return root;
+    }
+
     // Destructor
     ~Tree() {
         clear();        
