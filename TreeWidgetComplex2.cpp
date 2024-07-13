@@ -5,9 +5,12 @@
 
 TreeWidgetComplex2::TreeWidgetComplex2(std::shared_ptr<Node<Complex,2>> rootNode, QWidget* parent)
     : QWidget(parent), root(rootNode) {
-	connect(this, &TreeWidgetComplex2::renderTree, this, &TreeWidgetComplex2::handleRenderTree);
+	    renderConnection = connect(this, &TreeWidgetComplex2::renderTree, this, &TreeWidgetComplex2::handleRenderTree);
     }
 
+TreeWidgetComplex2::~TreeWidgetComplex2() {
+    disconnect(renderConnection); // Explicitly disconnect the signal
+}
 void TreeWidgetComplex2::setRoot(std::shared_ptr<Node<Complex,2>> rootNode) {
     root = rootNode;
 }

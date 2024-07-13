@@ -10,7 +10,7 @@ class TreeWidgetComplex2 : public QWidget {
 
 public:
     explicit TreeWidgetComplex2(std::shared_ptr<Node<Complex,2>> rootNode, QWidget* parent = nullptr);    
-
+    ~TreeWidgetComplex2(); // Destructor
     void setRoot(std::shared_ptr<Node<Complex,2>> rootNode);
     
 signals:
@@ -24,8 +24,8 @@ protected:
 
 private:
     std::shared_ptr<Node<Complex,2>> root;
-
-    void drawTree(QPainter& painter, std::shared_ptr<Node<Complex,2>> node, int x, int y, int hSpacing, int vSpacing);
+    QMetaObject::Connection renderConnection; // Store the connection
+    static void drawTree(QPainter& painter, std::shared_ptr<Node<Complex,2>> node, int x, int y, int hSpacing, int vSpacing);
 };
 
 #endif // TREEWIDGET_COMPLEX2_H

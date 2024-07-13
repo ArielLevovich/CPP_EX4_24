@@ -13,7 +13,7 @@
 #include "TreeWidgetComplex2.hpp"
 using namespace std;
 
-// Global pointer to QApplication
+// Global pointers
 QApplication* app = nullptr;
 TreeWidget* treeWidget = nullptr;
 TreeWidgetDouble3* treeWidgetDouble3 = nullptr;
@@ -43,7 +43,7 @@ std::ostream& operator<<(std::ostream& os, const Tree<double,2>& tree) {
         os << "]";
     }
     
-    if (treeWidget) {
+    if (treeWidget != nullptr) {
         // Set the root node for rendering and trigger the render signal
         treeWidget->setRoot(node);
         emit treeWidget->renderTree();
@@ -70,7 +70,7 @@ std::ostream& operator<<(std::ostream& os, const Tree<double,3>& tree) {
         os << "]";
     }
     
-    if (treeWidgetDouble3) {
+    if (treeWidgetDouble3 != nullptr) {
         // Set the root node for rendering and trigger the render signal
         treeWidgetDouble3->setRoot(node);
         emit treeWidgetDouble3->renderTree();
@@ -98,7 +98,7 @@ std::ostream& operator<<(std::ostream& os, const Tree<Complex,2>& tree) {
         os << "]";
     }
     
-    if (treeWidgetComplex2) {
+    if (treeWidgetComplex2 != nullptr) {
         // Set the root node for rendering and trigger the render signal
         treeWidgetComplex2->setRoot(node);
         emit treeWidgetComplex2->renderTree();
@@ -358,7 +358,7 @@ int main(int argc, char* argv[])
     // Create the TreeWidget object
     TreeWidgetDouble3 treeWidgetDouble3Instance(treeDouble3.getRoot());
     treeWidgetDouble3 = &treeWidgetDouble3Instance;
-    treeWidgetDouble3->resize(1200, 400);
+    treeWidgetDouble3->resize(1600, 400);
 
     cout << treeDouble3 << endl; // Should print the graph using GUI.
 
@@ -377,5 +377,5 @@ int main(int argc, char* argv[])
 
     // Start the Qt event loop
     int result = app->exec(); 
-    return result;	    
+    return result;	       
 }

@@ -45,7 +45,7 @@ AR            = ar cqs
 RANLIB        = 
 SED           = sed
 STRIP         = strip
-
+VALGRIND_FLAGS=-v --leak-check=full --show-leak-kinds=all  --error-exitcode=99
 ####### Output directory
 
 OBJECTS_DIR   = ./
@@ -57,14 +57,14 @@ SOURCES       = Demo.cpp \
 		TreeWidgetDouble3.cpp \
 		TreeWidgetComplex2.cpp moc_TreeWidget.cpp \
 		moc_TreeWidgetDouble3.cpp \
-		moc_TreeWidgetComplex2.cpp
+		moc_TreeWidgetComplex2.cpp 
 OBJECTS       = Demo.o \
 		TreeWidget.o \
 		TreeWidgetDouble3.o \
 		TreeWidgetComplex2.o \
 		moc_TreeWidget.o \
 		moc_TreeWidgetDouble3.o \
-		moc_TreeWidgetComplex2.o
+		moc_TreeWidgetComplex2.o 
 DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/unix.conf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/linux.conf \
@@ -248,7 +248,7 @@ Makefile: cpp_ex4_24.pro /usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++/qmake.c
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/yacc.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/lex.prf \
 		cpp_ex4_24.pro
-	$(QMAKE) -o Makefile cpp_ex4_24.pro
+#	$(QMAKE) -o Makefile cpp_ex4_24.pro
 /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf:
 /usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/unix.conf:
 /usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/linux.conf:
@@ -328,14 +328,32 @@ Makefile: cpp_ex4_24.pro /usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++/qmake.c
 /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/yacc.prf:
 /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/lex.prf:
 cpp_ex4_24.pro:
-qmake: FORCE
-	@$(QMAKE) -o Makefile cpp_ex4_24.pro
+#qmake: FORCE
+#	@$(QMAKE) -o Makefile cpp_ex4_24.pro
 
-qmake_all: FORCE
+#qmake_all: FORCE
 
+tree: Makefile cpp_ex4_24
+	  ./cpp_ex4_24	
 
 all: Makefile cpp_ex4_24
 
+Test.o: Test.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+TestCounter.o: TestCounter.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+test: TestCounter.o Test.o 
+	$(CXX) $(CXXFLAGS) $^ -o test
+	./test
+
+tidy:
+	clang-tidy $(SOURCES) -checks=bugprone-*,clang-analyzer-*,cppcoreguidelines-*,performance-*,portability-*,readability-*,-cppcoreguidelines-pro-bounds-pointer-arithmetic,-cppcoreguidelines-owning-memory --warnings-as-errors=-* --
+
+valgrind: all
+	valgrind --tool=memcheck $(VALGRIND_FLAGS) ./cpp_ex4_24 2>&1 | { egrep "lost| at " || true; }
+	
 dist: distdir FORCE
 	(cd `dirname $(DISTDIR)` && $(TAR) $(DISTNAME).tar $(DISTNAME) && $(COMPRESS) $(DISTNAME).tar) && $(MOVE) `dirname $(DISTDIR)`/$(DISTNAME).tar.gz . && $(DEL_FILE) -r $(DISTDIR)
 
@@ -350,7 +368,8 @@ distdir: FORCE
 clean: compiler_clean 
 	-$(DEL_FILE) $(OBJECTS)
 	-$(DEL_FILE) *~ core *.core
-
+	-$(DEL_FILE) Test.o
+	-$(DEL_FILE) TestCounter.o
 
 distclean: clean 
 	-$(DEL_FILE) $(TARGET) 

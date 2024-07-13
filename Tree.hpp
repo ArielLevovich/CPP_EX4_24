@@ -102,7 +102,7 @@ public:
         std::shared_ptr<Node<T,K>> empty;
         return HeapIterator<T,K>(empty);
     }
-        
+          
 private:
     // Helper function to find a node by value
     std::shared_ptr<Node<T,K>> find_node(std::shared_ptr<Node<T,K>> node, const T& value) {

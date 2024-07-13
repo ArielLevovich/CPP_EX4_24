@@ -9,7 +9,7 @@ class TreeWidgetDouble3 : public QWidget {
 
 public:
     explicit TreeWidgetDouble3(std::shared_ptr<Node<double,3>> rootNode, QWidget* parent = nullptr);    
-
+    ~TreeWidgetDouble3(); // Destructor
     void setRoot(std::shared_ptr<Node<double,3>> rootNode);
     
 signals:
@@ -23,8 +23,8 @@ protected:
 
 private:
     std::shared_ptr<Node<double,3>> root;
-
-    void drawTree(QPainter& painter, std::shared_ptr<Node<double,3>> node, int x, int y, int hSpacing, int vSpacing);
+    QMetaObject::Connection renderConnection; // Store the connection
+    static void drawTree(QPainter& painter, std::shared_ptr<Node<double,3>> node, int x, int y, int hSpacing, int vSpacing);
 };
 
 #endif // TREEWIDGET_DOUBLE3_H

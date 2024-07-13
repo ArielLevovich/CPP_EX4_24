@@ -1,434 +1,400 @@
 // ariel.levovich@msmail.ariel.ac.il 
+#include <iomanip> // for std::setprecision
 #include "doctest.h"
-#include "Algorithms.hpp"
-#include "Graph.hpp"
+#include "Tree.hpp"
+#include "Complex.hpp"
 
 using namespace std;
 
-TEST_CASE("Test graph addition1")
-{
-    ariel::Graph g1;
-    vector<vector<int>> graph = {
-        {0, 1, 0},
-        {1, 0, 1},
-        {0, 1, 0}};
-    g1.loadGraph(graph);
-    ariel::Graph g2;
-    vector<vector<int>> weightedGraph = {
-        {0, 1, 1},
-        {1, 0, 2},
-        {1, 2, 0}};
-    g2.loadGraph(weightedGraph);
-    ariel::Graph g3 = g1 + g2;
-    vector<vector<int>> expectedGraph = {
-        {0, 2, 1},
-        {2, 0, 3},
-        {1, 3, 0}};
-    CHECK(g3.printGraph() == "[0, 2, 1]\n[2, 0, 3]\n[1, 3, 0]\n");    
+void createInt2Tree(Tree<int,2>& tree) {
+    // The tree should look like:
+    /**
+     *       root = (8)
+     *     /           \
+     *    (13)         (5)
+     *   /    \        /  \
+     *  (6)  (7)     (3)  (2)
+     */
+    Node<int,2> root2_node = Node<int,2>(8);    
+    tree.add_root(root2_node);
+    Node<int,2> m1 = Node<int,2>(13);
+    Node<int,2> m2 = Node<int,2>(5);
+    Node<int,2> m3 = Node<int,2>(6);
+    Node<int,2> m4 = Node<int,2>(7);
+    Node<int,2> m5 = Node<int,2>(3);
+    Node<int,2> m6 = Node<int,2>(2);
+
+    tree.add_sub_node(root2_node, m1);
+    tree.add_sub_node(root2_node, m2);
+    tree.add_sub_node(m1, m3);
+    tree.add_sub_node(m1, m4);
+    tree.add_sub_node(m2, m5);
+    tree.add_sub_node(m2, m6);
 }
 
-TEST_CASE("Test graph multiplication2")
+TEST_CASE("1. Test add_root")
 {
-    ariel::Graph g1;
-    vector<vector<int>> graph = {
-        {0, 1, 0},
-        {1, 0, 1},
-        {0, 1, 0}};
-    g1.loadGraph(graph);
-    ariel::Graph g2;
-    vector<vector<int>> weightedGraph = {
-        {0, 1, 1},
-        {1, 0, 2},
-        {1, 2, 0}};
-    g2.loadGraph(weightedGraph);
-    ariel::Graph g4 = g1 * g2;
-    vector<vector<int>> expectedGraph = {
-        {1, 0, 2},
-        {1, 3, 1},
-        {1, 0, 2}};
-    CHECK(g4.printGraph() == "[1, 0, 2]\n[1, 3, 1]\n[1, 0, 2]\n");    
+    Tree<int,2> tree;
+    Node<int,2> root = Node<int,2>(999);    
+    tree.add_root(root);
+    CHECK(tree.getRoot()->get_value() == 999);    
 }
 
-TEST_CASE("Invalid operations3")
+TEST_CASE("2. Test add_sub_node")
 {
-    ariel::Graph g1;
-    vector<vector<int>> graph = {
-        {0, 1, 0},
-        {1, 0, 1},
-        {0, 1, 0}};
-    g1.loadGraph(graph);
-    ariel::Graph g2;
-    vector<vector<int>> weightedGraph = {
-        {0, 1, 1, 1},
-        {1, 0, 2, 1},
-        {1, 2, 0, 1}};
-    CHECK_THROWS(g2.loadGraph(weightedGraph));
-    ariel::Graph g5;
-    vector<vector<int>> graph2 = {
-        {0, 1, 0, 0, 1},
-        {1, 0, 1, 0, 0},
-        {0, 1, 0, 1, 0},
-        {0, 0, 1, 0, 1},
-        {1, 0, 0, 1, 0}};
-    g5.loadGraph(graph2);
-    g2.loadGraph(graph2);
-    CHECK_THROWS(g5 * g1);
-    CHECK_THROWS(g1 * g2);
+    Tree<int,2> tree;
+    Node<int,2> root = Node<int,2>(5);    
+    tree.add_root(root);
+    Node<int,2> node = Node<int,2>(13);
 
-    // Addition of two graphs with different dimensions
-    ariel::Graph g6;
-    vector<vector<int>> graph3 = {
-        {0, 1, 0, 0, 1},
-        {1, 0, 1, 0, 0},
-        {0, 1, 0, 1, 0},
-        {0, 0, 1, 0, 1},
-        {1, 0, 0, 1, 0}};
-    g6.loadGraph(graph3);
-    CHECK_THROWS(g1 + g6);
+    tree.add_sub_node(root, node);
+    CHECK(tree.getRoot()->get_children()[0]->get_value() == 13);       
 }
 
-TEST_CASE("Test graph multiplication4")
-{
-    ariel::Graph g1;
-    vector<vector<int>> graph = {
-        {0, 1, 0},
-        {1, 0, 1},
-        {0, 1, 0}};
-    g1.loadGraph(graph);
-    ariel::Graph g2;
-    vector<vector<int>> weightedGraph = {
-        {1, 0, 0},
-        {0, 1, 0},
-        {0, 0, 0}};
-    g2.loadGraph(weightedGraph);
-    ariel::Graph g4 = g1 * g2;
-    vector<vector<int>> expectedGraph = {
-        {0, 1, 0},
-        {1, 0, 0},
-        {0, 1, 0}};
-    CHECK(g4.printGraph() == "[0, 1, 0]\n[1, 0, 0]\n[0, 1, 0]\n");
+TEST_CASE("3. Test pre order scan tree<int,2>")
+{    
+    Tree<int,2> tree;
+    createInt2Tree(tree);
+
+    std::string output;    
+    for (auto node = tree.begin_pre_order(); node != tree.end_pre_order(); ++node)
+    {
+        output += std::to_string(node.get_value());
+        output += " ";        
+    }
+    CHECK(output == "8 13 6 7 5 3 2 "); 
 }
 
-TEST_CASE("5 - Test graph prefix increment, equality and unary +")
+TEST_CASE("4. Test post order scan tree<int,2>")
 {
-    ariel::Graph g1;
-    vector<vector<int>> graph = {
-        {0, 1, 0},
-        {1, 0, 1},
-        {0, 1, 0}};
-    g1.loadGraph(graph);
-    ++g1;
-    auto g2 = +g1;
-        
-    vector<vector<int>> expectedGraph = {
-        {1, 2, 1},
-        {2, 1, 2},
-        {1, 2, 1}};
-    ariel::Graph g3;
-    g3.loadGraph(expectedGraph);
-    bool result = g2 == g3;
-    CHECK(result == true);    
-}
-
-TEST_CASE("6 - Test graph postfix increment, equality and unary -")
-{
-    ariel::Graph g1;
-    vector<vector<int>> graph = {
-        {0, 1, 0},
-        {1, 0, 1},
-        {0, 1, 0}};
-    g1.loadGraph(graph);
-    auto g2 = g1++;
-            
-    vector<vector<int>> expectedGraph = {
-        {1, 2, 1},
-        {2, 1, 2},
-        {1, 2, 1}};
-    ariel::Graph g3;
-    g3.loadGraph(expectedGraph);
-    bool result = g2 == g3;
-    CHECK(result == true);    
-
-    auto g4 = -g2;
-    vector<vector<int>> expectedGraph2 = {
-        {-1, -2, -1},
-        {-2, -1, -2},
-        {-1, -2, -1}};
-    ariel::Graph g5;
-    g5.loadGraph(expectedGraph2);
-    bool result2 = g4 == g5;
-    CHECK(result2 == true); 
-}
-
-TEST_CASE("7 - Test graph +=, -=, g1-g2")
-{
-    ariel::Graph g1;
-    vector<vector<int>> graph = {
-        {0, 1, 0},
-        {1, 0, 1},
-        {0, 1, 0}};
-    g1.loadGraph(graph);
-    auto g2 = g1++;
-
-    g1 += g2;            
-    vector<vector<int>> expectedGraph = {
-        {1, 3, 1},
-        {3, 1, 3},
-        {1, 3, 1}};
-    ariel::Graph g3;
-    g3.loadGraph(expectedGraph);
-    bool result = g1 == g3;
-    CHECK(result == true);    
-
-    auto g4 = g2 - g1;
-    g2 -= g1;    
-    bool result2 = g2 == g4;
-    CHECK(result2 == true); 
-}
-
-TEST_CASE("8 - Test graph >, <, !=")
-{
-    ariel::Graph g1;
-    vector<vector<int>> graph = {
-        {0, 1, 0},
-        {1, 0, 1},
-        {0, 1, 0}};
-    g1.loadGraph(graph);
-    vector<vector<int>> graph2 = {
-        {0, 1, 1},
-        {1, 0, 1},
-        {1, 1, 0}};
-    ariel::Graph g2;
-    g2.loadGraph(graph2);
-    CHECK((g1 < g2) == true); 
-
-    vector<vector<int>> graph3 = {
-        {0, 1, 0},
-        {1, 0, 0},
-        {0, 0, 0}};
-    ariel::Graph g3;
-    g3.loadGraph(graph3);    
-    CHECK((g1 > g3) == true);       
+    Tree<int,2> tree;
+    createInt2Tree(tree);
     
-    auto g4 = g1 + g2;
-    CHECK((g4 != g2) == true);
-    CHECK((g4 != g1) == true);
-    CHECK((g4 != g3) == true);
+    std::string output;    
+    for (auto node = tree.begin_post_order(); node != tree.end_post_order(); ++node)
+    {
+        output += std::to_string(node.get_value());
+        output += " ";        
+    }
+    CHECK(output == "6 7 13 3 2 5 8 "); 
 }
 
-TEST_CASE("9 - Test graph >=, <=")
+TEST_CASE("5. Test in order scan tree<int,2>")
 {
-    ariel::Graph g1;
-    vector<vector<int>> graph = {
-        {0, 1, 0},
-        {1, 0, 1},
-        {0, 1, 0}};
-    g1.loadGraph(graph);
-    vector<vector<int>> graph2 = {
-        {0, 1, 1},
-        {1, 0, 1},
-        {1, 1, 0}};
-    ariel::Graph g2;
-    g2.loadGraph(graph2);
-    CHECK((g1 <= g2) == true); 
-
-    vector<vector<int>> graph3 = {
-        {0, 1, 0},
-        {1, 0, 0},
-        {0, 0, 0}};
-    ariel::Graph g3;
-    g3.loadGraph(graph3);    
-    CHECK((g1 >= g3) == true);       
+    Tree<int,2> tree;
+    createInt2Tree(tree);
     
-    auto g4 = +g1;
-    auto g5 = -g2;
-    CHECK((g4 >= g1) == true);
-    CHECK((g4 <= g1) == true);
-    CHECK((g5 <= g2) == false);
-    CHECK((g5 >= g2) == false);
+    std::string output;    
+    for (auto node = tree.begin_in_order(); node != tree.end_in_order(); ++node)
+    {
+        output += std::to_string(node.get_value());
+        output += " ";        
+    }
+    CHECK(output == "6 13 7 8 3 5 2 ");  
 }
 
-TEST_CASE("10 - Test graph prefix decrement")
+TEST_CASE("6 - Test BFS scan tree<int,2>")
 {
-    ariel::Graph g1;
-    vector<vector<int>> graph = {
-        {0, 2, 3},
-        {2, 0, 4},
-        {3, 4, 0}};
-    g1.loadGraph(graph);
-    --g1;
-    CHECK(g1.printGraph() == "[-1, 1, 2]\n[1, -1, 3]\n[2, 3, -1]\n");    
+    Tree<int,2> tree;
+    createInt2Tree(tree);
+    
+    std::string output;    
+    for (auto node = tree.begin_bfs_scan(); node != tree.end_bfs_scan(); ++node)
+    {
+        output += std::to_string(node.get_value());
+        output += " ";        
+    }
+    CHECK(output == "8 13 5 6 7 3 2 ");  
 }
 
-TEST_CASE("11 - Test graph postfix decrement")
+TEST_CASE("7 - Test DFS scan tree<int,2>")
 {
-    ariel::Graph g1;
-    vector<vector<int>> graph = {
-        {1, 1, 1},
-        {1, 1, 1},
-        {1, 1, 1}};
-    g1.loadGraph(graph);
-    auto g2 = g1--;            
-    CHECK(g2.printGraph() == "[0, 0, 0]\n[0, 0, 0]\n[0, 0, 0]\n");
+    Tree<int,2> tree;
+    createInt2Tree(tree);
+    
+    std::string output;    
+    for (auto node = tree.begin_dfs_scan(); node != tree.end_dfs_scan(); ++node)
+    {
+        output += std::to_string(node.get_value());
+        output += " ";        
+    }
+    CHECK(output == "8 13 6 7 5 3 2 ");  
 }
 
-TEST_CASE("12 - Test graph operator* (scalar)")
+TEST_CASE("8 - Test Heap scan tree<int,2>")
 {
-    ariel::Graph g1;
-    vector<vector<int>> graph = {
-        {0, 1, 1},
-        {1, 0, 1},
-        {1, 1, 0}};
-    g1.loadGraph(graph);
-    auto g2 = g1*13;            
-    CHECK(g2.printGraph() == "[0, 13, 13]\n[13, 0, 13]\n[13, 13, 0]\n");
+    Tree<int,2> tree;
+    createInt2Tree(tree);
+    
+    std::string output;    
+    for (auto node = tree.myHeap(); node.isNotEmpty(); ++node)
+    {
+        output += std::to_string(node.get_value());
+        output += " ";        
+    }
+    CHECK(output == "2 3 5 6 7 8 13 ");  
 }
 
-TEST_CASE("13 - Test graph operator*= (scalar)")
-{
-    ariel::Graph g1;
-    vector<vector<int>> graph = {
-        {0, 1, 1},
-        {1, 0, 1},
-        {1, 1, 0}};
-    g1.loadGraph(graph);
-    g1*=13;            
-    CHECK(g1.printGraph() == "[0, 13, 13]\n[13, 0, 13]\n[13, 13, 0]\n");
+void createDouble3Tree(Tree<double,3>& tree) {
+    // The tree should look like:
+    /**
+     *           root = (1)
+     *     /            |             \
+     *    (2)          (3)            (5)
+     *   /  |  \      /  \   \        /   \     \
+     *(8) (13) (21) (34) (55) (89)  (144) (233) (377)
+     *               /  \
+     *            (400) (269)
+     * 
+     */
+    Node<double,3> root = Node<double,3>(1);    
+    tree.add_root(root);
+    Node<double,3> m1 = Node<double,3>(2);
+    Node<double,3> m2 = Node<double,3>(3);
+    Node<double,3> m3 = Node<double,3>(5);
+    Node<double,3> m4 = Node<double,3>(8);
+    Node<double,3> m5 = Node<double,3>(13);
+    Node<double,3> m6 = Node<double,3>(21);
+    Node<double,3> m7 = Node<double,3>(34);
+    Node<double,3> m8 = Node<double,3>(55);
+    Node<double,3> m9 = Node<double,3>(89);
+    Node<double,3> m10 = Node<double,3>(144);
+    Node<double,3> m11 = Node<double,3>(233);
+    Node<double,3> m12 = Node<double,3>(377);
+    Node<double,3> m13 = Node<double,3>(400);
+    Node<double,3> m14 = Node<double,3>(269);
+
+    tree.add_sub_node(root, m1);
+    tree.add_sub_node(root, m2);
+    tree.add_sub_node(root, m3);
+    tree.add_sub_node(m1, m4);
+    tree.add_sub_node(m1, m5);
+    tree.add_sub_node(m1, m6);
+    tree.add_sub_node(m2, m7);
+    tree.add_sub_node(m2, m8);
+    tree.add_sub_node(m2, m9);
+    tree.add_sub_node(m3, m10);
+    tree.add_sub_node(m3, m11);
+    tree.add_sub_node(m3, m12);
+    tree.add_sub_node(m7, m13);
+    tree.add_sub_node(m7, m14);
 }
 
-TEST_CASE("14 - Test graph operator/ (scalar)")
+TEST_CASE("9. Test pre order scan tree<double,3>")
 {
-    ariel::Graph g1;
-    vector<vector<int>> graph = {
-        {0, 10, 10},
-        {10, 0, 10},
-        {10, 10, 0}};
-    g1.loadGraph(graph);
-    auto g2 = g1/2;            
-    CHECK(g2.printGraph() == "[0, 5, 5]\n[5, 0, 5]\n[5, 5, 0]\n");
+    Tree<double,3> tree;
+    createDouble3Tree(tree);    
+    
+    std::string output;
+
+    for (auto node = tree.begin_pre_order(); node != tree.end_pre_order(); ++node)
+    {        
+        std::ostringstream oss;
+        oss << std::fixed << std::setprecision(1) << node.get_value();
+        output += oss.str();    
+        output += " ";        
+    }
+    CHECK(output == "1.0 2.0 8.0 13.0 21.0 3.0 34.0 400.0 269.0 55.0 89.0 5.0 144.0 233.0 377.0 ");     
 }
 
-TEST_CASE("15 - Test graph operator/= (scalar)")
+TEST_CASE("10. Test post order scan tree<double,3>")
 {
-    ariel::Graph g1;
-    vector<vector<int>> graph = {
-        {0, 10, 10},
-        {10, 0, 10},
-        {10, 10, 0}};
-    g1.loadGraph(graph);
-    g1/=5;            
-    CHECK(g1.printGraph() == "[0, 2, 2]\n[2, 0, 2]\n[2, 2, 0]\n");
+    Tree<double,3> tree;
+    createDouble3Tree(tree);    
+    
+    std::string output;
+
+    for (auto node = tree.begin_post_order(); node != tree.end_post_order(); ++node)
+    {        
+        std::ostringstream oss;
+        oss << std::fixed << std::setprecision(1) << node.get_value();
+        output += oss.str();    
+        output += " ";        
+    }
+    CHECK(output == "8.0 13.0 21.0 2.0 400.0 269.0 34.0 55.0 89.0 3.0 144.0 233.0 377.0 5.0 1.0 "); 
 }
 
-TEST_CASE("15 - Test graph operator/= (scalar)")
+TEST_CASE("11. Test in order scan tree<double,3>")
 {
-    ariel::Graph g1;
-    vector<vector<int>> graph = {
-        {0, 10, 10},
-        {10, 0, 10},
-        {10, 10, 0}};
-    g1.loadGraph(graph);
-    g1/=5;            
-    CHECK(g1.printGraph() == "[0, 2, 2]\n[2, 0, 2]\n[2, 2, 0]\n");
+    Tree<double,3> tree;
+    createDouble3Tree(tree);    
+    
+    std::string output;
+
+    for (auto node = tree.begin_in_order(); node != tree.end_in_order(); ++node)
+    {        
+        std::ostringstream oss;
+        oss << std::fixed << std::setprecision(1) << node.get_value();
+        output += oss.str();    
+        output += " ";        
+    }
+    CHECK(output == "8.0 2.0 13.0 21.0 1.0 400.0 34.0 269.0 3.0 55.0 89.0 144.0 5.0 233.0 377.0 ");    
 }
 
-TEST_CASE("16 - has negative cycle before and after appying *-1 doesn't have it anymore")
+TEST_CASE("12 - Test BFS scan tree<double,3>")
 {
-    ariel::Graph g;
-    const vector<vector<int>> graph6 = {
-        {0, 0, 0, 0},
-        {4, 0, -6, 0},
-        {0, 0, 0, 5},
-        {0, -2, 0, 0}};
-    g.loadGraph(graph6); 
+    Tree<double,3> tree;
+    createDouble3Tree(tree);    
+    
+    std::string output;
 
-    CHECK(ariel::Algorithms::hasNegativeCycle(g) == true); 
-    g *= -1;
-    CHECK(g.printGraph() == "[0, 0, 0, 0]\n[-4, 0, 6, 0]\n[0, 0, 0, -5]\n[0, 2, 0, 0]\n");
-    CHECK(ariel::Algorithms::hasNegativeCycle(g) == false); 
+    for (auto node = tree.begin_bfs_scan(); node != tree.end_bfs_scan(); ++node)
+    {        
+        std::ostringstream oss;
+        oss << std::fixed << std::setprecision(1) << node.get_value();
+        output += oss.str();    
+        output += " ";        
+    }
+    CHECK(output == "1.0 2.0 3.0 5.0 8.0 13.0 21.0 34.0 55.0 89.0 144.0 233.0 377.0 400.0 269.0 ");
 }
 
-TEST_CASE("17 - 'g' is not connected before and after appying '++g' becomes connected")
+TEST_CASE("13 - Test DFS scan tree<double,3>")
 {
-    ariel::Graph g;
-    vector<vector<int>> graph2 = {
-        {0, 1, 1, 0, 0},
-        {1, 0, 1, 0, 0},
-        {1, 1, 0, 1, 0},
-        {0, 0, 1, 0, 0},
-        {0, 0, 0, 0, 0}};
-    g.loadGraph(graph2);
-    CHECK(ariel::Algorithms::isConnected(g) == false);
+    Tree<double,3> tree;
+    createDouble3Tree(tree);    
+    
+    std::string output;
 
-    ++g;
-    CHECK(ariel::Algorithms::isConnected(g) == true); 
+    for (auto node = tree.begin_dfs_scan(); node != tree.end_dfs_scan(); ++node)
+    {        
+        std::ostringstream oss;
+        oss << std::fixed << std::setprecision(1) << node.get_value();
+        output += oss.str();    
+        output += " ";        
+    }
+    CHECK(output == "1.0 2.0 8.0 13.0 21.0 3.0 34.0 400.0 269.0 55.0 89.0 5.0 144.0 233.0 377.0 ");
 }
 
-TEST_CASE("18 - Test directed graph shortest path before and after adding another graph to the original one")
+TEST_CASE("14 - Test Heap scan tree<double,3>")
 {
-    ariel::Graph g;
-    vector<vector<int>> graph = {
-        {0, 0, 0, 0},
-        {4, 0, -1, 0},
-        {0, 0, 0, 5},
-        {0, -2, 0, 0}};
-    g.loadGraph(graph);
-    CHECK(ariel::Algorithms::shortestPath(g, 1, 3) == "1->2->3");
+    Tree<double,3> tree;
+    createDouble3Tree(tree);    
+    
+    std::string output;
 
-    vector<vector<int>> graph2 = {
-        {0, 0, 0, -1},
-        {0, 0, 0, 0},
-        {0, 0, 0, 0},
-        {0, 0, 0, 0}};
-    ariel::Graph g2;
-    g2.loadGraph(graph2);
-    g += g2;
-    cout << g.printGraph();    
-    CHECK(ariel::Algorithms::shortestPath(g, 1, 3) == "1->0->3");
+    for (auto node = tree.myHeap(); node.isNotEmpty(); ++node)
+    {        
+        std::ostringstream oss;
+        oss << std::fixed << std::setprecision(1) << node.get_value();
+        output += oss.str();    
+        output += " ";        
+    }
+    CHECK(output == "1.0 2.0 3.0 5.0 8.0 13.0 21.0 34.0 55.0 89.0 144.0 233.0 269.0 377.0 400.0 ");
 }
 
-TEST_CASE("19 - graph is directed before and got undirected after")
-{
-    ariel::Graph g;
-    vector<vector<int>> graph = {
-        {0, 0, 0, 0, 0, 1, 0},
-        {0, 0, 0, 0, 0, 0, 1},
-        {0, 1, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 1, 0, 0},
-        {0, 0, 0, 0, 0, 0, 1},
-        {0, 0, 1, 0, 0, 0, 0},
-        {0, 0, 0, 1, 0, 0, 0},};
+void createComplex2Tree(Tree<Complex,2>& tree) {
+    // The tree should look like:
+    /**
+     *       root = (8-i)
+     *     /           \
+     *    (13-i)         (5-i)
+     *   /    \        /  \
+     *  (6-i)  (7-i)     (3-i)  (2-i)
+     */
+    Complex c1(8,-1);
+    Complex c2(13,-1);
+    Complex c3(5,-1);
+    Complex c4(6,-1);
+    Complex c5(7,-1);
+    Complex c6(3,-1);
+    Complex c7(2,-1);
+    Node<Complex,2> root = Node<Complex,2>(c1);    
+    tree.add_root(root);
+    Node<Complex,2> m1 = Node<Complex,2>(c2);
+    Node<Complex,2> m2 = Node<Complex,2>(c3);
+    Node<Complex,2> m3 = Node<Complex,2>(c4);
+    Node<Complex,2> m4 = Node<Complex,2>(c5);
+    Node<Complex,2> m5 = Node<Complex,2>(c6);
+    Node<Complex,2> m6 = Node<Complex,2>(c7);
 
-    g.loadGraph(graph); 
-
-    CHECK(g.isDirected() == true);    
-
-    ariel::Graph g2;
-    vector<vector<int>> graph2 = {
-        {0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 1, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 1, 0},
-        {0, 0, 0, 0, 0, 0, 1},
-        {0, 0, 0, 1, 0, 0, 0},
-        {1, 0, 0, 0, 0, 0, 0},
-        {0, 1, 0, 0, 1, 0, 0},};
-
-    g2.loadGraph(graph2);   
-    g += g2;
-    CHECK(g.isDirected() == false); 
+    tree.add_sub_node(root, m1);
+    tree.add_sub_node(root, m2);
+    tree.add_sub_node(m1, m3);
+    tree.add_sub_node(m1, m4);
+    tree.add_sub_node(m2, m5);
+    tree.add_sub_node(m2, m6);
 }
 
-TEST_CASE("20 - Test Undirected shortestPath - No Path Exists before and after applying '++g' the path exists.")
+TEST_CASE("15. Test pre order scan tree<Complex,2>")
 {
-    ariel::Graph g;
-    vector<vector<int>> graph2 = {
-        {0, 1, 1, 0, 0},
-        {1, 0, 1, 0, 0},
-        {1, 1, 0, 1, 0},
-        {0, 0, 1, 0, 0},
-        {0, 0, 0, 0, 0}};
-    g.loadGraph(graph2);
-    CHECK(ariel::Algorithms::shortestPath(g, 0, 4) == "No path from source to destination.");
-    ++g;
-    CHECK(ariel::Algorithms::shortestPath(g, 0, 4) == "0->4");
+    Tree<Complex,2> tree;
+    createComplex2Tree(tree);
+
+    std::string output;    
+    for (auto node = tree.begin_pre_order(); node != tree.end_pre_order(); ++node)
+    {
+        output += node.get_value().toString();
+        output += " ";        
+    }
+    CHECK(output == "8-1i 13-1i 6-1i 7-1i 5-1i 3-1i 2-1i "); 
+}
+
+TEST_CASE("16. Test post order scan tree<Complex,2>")
+{
+    Tree<Complex,2> tree;
+    createComplex2Tree(tree);
+
+    std::string output;    
+    for (auto node = tree.begin_post_order(); node != tree.end_post_order(); ++node)
+    {
+        output += node.get_value().toString();
+        output += " ";        
+    }
+    CHECK(output == "6-1i 7-1i 13-1i 3-1i 2-1i 5-1i 8-1i "); 
+}
+
+TEST_CASE("17. Test in order scan tree<Complex,2>")
+{
+    Tree<Complex,2> tree;
+    createComplex2Tree(tree);
+
+    std::string output;    
+    for (auto node = tree.begin_in_order(); node != tree.end_in_order(); ++node)
+    {
+        output += node.get_value().toString();
+        output += " ";        
+    }
+    CHECK(output == "6-1i 13-1i 7-1i 8-1i 3-1i 5-1i 2-1i ");   
+}
+
+TEST_CASE("18 - Test BFS scan tree<Complex,2>")
+{
+    Tree<Complex,2> tree;
+    createComplex2Tree(tree);
+
+    std::string output;    
+    for (auto node = tree.begin_bfs_scan(); node != tree.end_bfs_scan(); ++node)
+    {
+        output += node.get_value().toString();
+        output += " ";        
+    }
+    CHECK(output == "8-1i 13-1i 5-1i 6-1i 7-1i 3-1i 2-1i "); 
+}
+
+TEST_CASE("19 - Test DFS scan tree<Complex,2>")
+{
+    Tree<Complex,2> tree;
+    createComplex2Tree(tree);
+
+    std::string output;    
+    for (auto node = tree.begin_dfs_scan(); node != tree.end_dfs_scan(); ++node)
+    {
+        output += node.get_value().toString();
+        output += " ";        
+    }
+    CHECK(output == "8-1i 13-1i 6-1i 7-1i 5-1i 3-1i 2-1i "); 
+}
+
+TEST_CASE("20 - Test Heap scan tree<Complex,2>")
+{
+    Tree<Complex,2> tree;
+    createComplex2Tree(tree);
+
+    std::string output;    
+    for (auto node = tree.myHeap(); node.isNotEmpty(); ++node)
+    {
+        output += node.get_value().toString();
+        output += " ";        
+    }
+    CHECK(output == "2-1i 3-1i 5-1i 6-1i 7-1i 8-1i 13-1i ");
 }
