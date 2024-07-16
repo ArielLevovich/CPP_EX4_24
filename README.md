@@ -816,22 +816,56 @@ This project includes a comprehensive suite of tests for the `Tree`, `Node`, and
 - **Description:** Verifies the heap traversal of a binary tree with complex number values.
 - **Check:** Ensures the nodes are visited in the correct min-heap sequence.
 
+## Overview
+
+This project includes the implementation and testing of various tree structures and nodes. The trees are generic and can handle different data types, such as `int`, `double`, and `Complex`. Each tree type is tested for various traversal methods, ensuring the correctness of the implementation.
+
+## Tree and Node Classes
+
+### Tree Class Templates
+
+We have implemented three primary tree classes, each with a different maximum number of children per node:
+
+1. **Tree<double, 2>**
+   - **Description:** A binary tree where each node can have at most 2 children.
+   - **Usage:** Suitable for representing hierarchical data structures that require a binary relationship, such as binary search trees.
+
+2. **Tree<Complex, 2>**
+   - **Description:** A binary tree where each node contains a complex number and can have at most 2 children.
+   - **Usage:** Used for scenarios where nodes represent complex numbers, maintaining the binary structure.
+
+3. **Tree<double, 3>**
+   - **Description:** A ternary tree where each node can have at most 3 children.
+   - **Usage:** Suitable for representing more complex hierarchical structures with a higher branching factor, such as decision trees.
+
+### Node Class Templates
+
+The node class templates are designed to work with the tree class templates. Each node can hold a value of the specified data type (`int`, `double`, `Complex`) and a fixed number of children based on the tree type.
+
+## Why Three Tree Classes?
+
+The reason for having three different tree classes (`Tree<double, 2>`, `Tree<Complex, 2>`, `Tree<double, 3>`) is to demonstrate and test the flexibility of our tree implementation in handling different data types and structures. Each class is specialized for a particular use case:
+
+- **Binary trees with `double` values**: For applications requiring binary relationships.
+- **Binary trees with `Complex` values**: For applications dealing with complex numbers.
+- **Ternary trees with `double` values**: For more complex hierarchical structures with a higher branching factor.
+
+## Tests Description
+
+The tests are designed to verify the correctness of various operations on the tree classes, including adding nodes and performing different types of traversals. Each test ensures that the tree structure and traversal methods work as expected.
+
 ### Memory Leak Analysis
 
-When running the tests with `valgrind` using the command `make valgrind`, we encountered several memory leaks. These leaks are mainly related to `realloc` and `malloc` calls. The errors were found in various parts of the program, especially related to the usage of Qt:
+Running the tests with `valgrind` using the command `make valgrind` revealed several memory leaks. These leaks are mainly related to `realloc` and `malloc` calls within the Qt framework, not within our tree implementation. The analysis showed that without using Qt, our implementation does not have memory leaks:
 
 ```
-==3118961==    at 0x484DCD3: realloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
-==3118961==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
-...
 ==3118961==    definitely lost: 256 bytes in 1 blocks
 ==3118961==    indirectly lost: 32 bytes in 1 blocks
 ==3118961==      possibly lost: 1,152 bytes in 3 blocks
 ```
 
-These memory leaks are attributed to Qt and not to the logic of our implementation. This was verified by running the demo without using Qt, which resulted in no memory leaks. Attempts to explicitly disconnect signals using `disconnect(renderConnection)` did not resolve the memory leaks.
+When running the demo without Qt, no memory leaks were detected:
 
-Summary of memory leaks without Qt:
 ```
 ==2444108==    definitely lost: 0 bytes in 0 blocks
 ==2444108==    indirectly lost: 0 bytes in 0 blocks
@@ -840,7 +874,4 @@ Summary of memory leaks without Qt:
 
 ### Conclusion
 
-The test suite comprehensively covers the functionality of the `Tree` and `Node` classes. While the `valgrind` analysis highlighted some memory issues, they are related to Qt and not the implementation itself. Future work should consider further optimization and potential fixes for Qt-related memory management.
-
-This explanation highlights why using header files for template classes is essential in C++ and how it benefits the project by simplifying compilation and avoiding common issues.
-This README provides an overview of the project's structure and functionality. For detailed implementation and usage instructions, refer to the source code and comments within the code files.
+This project demonstrates the implementation of flexible and generic tree structures capable of handling various data types and tree configurations. The comprehensive test suite ensures the correctness of these implementations. The memory leak analysis highlights that the detected leaks are related to the Qt framework and not our code. Future work may focus on further optimizing the code and addressing any Qt-related memory management issues.
