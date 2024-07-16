@@ -816,6 +816,10 @@ This project includes a comprehensive suite of tests for the `Tree`, `Node`, and
 - **Description:** Verifies the heap traversal of a binary tree with complex number values.
 - **Check:** Ensures the nodes are visited in the correct min-heap sequence.
 
+Certainly! Here is the detailed text based on the content from your images and previous information.
+
+### README
+
 ## Overview
 
 This project includes the implementation and testing of various tree structures and nodes. The trees are generic and can handle different data types, such as `int`, `double`, and `Complex`. Each tree type is tested for various traversal methods, ensuring the correctness of the implementation.
@@ -842,15 +846,15 @@ We have implemented three primary tree classes, each with a different maximum nu
 
 The node class templates are designed to work with the tree class templates. Each node can hold a value of the specified data type (`int`, `double`, `Complex`) and a fixed number of children based on the tree type.
 
-## Why Three Tree Classes?
+## Why Three TreeWidget Classes?
 
-The reason for having three different tree classes (`Tree<double, 2>`, `Tree<Complex, 2>`, `Tree<double, 3>`) is to demonstrate and test the flexibility of our tree implementation in handling different data types and structures. Each class is specialized for a particular use case:
+The reason for having three different TreeWidget classes (`TreeWidget<double, 2>`, `TreeWidget<Complex, 2>`, `TreeWidget<double, 3>`) is due to the limitations and requirements when working with the Qt5 framework. Qt5 expects the presence of corresponding `TreeWidget.cpp` files, which led to complications in implementing a single template class in an `.hpp` file. 
 
-- **Binary trees with `double` values**: For applications requiring binary relationships.
-- **Binary trees with `Complex` values**: For applications dealing with complex numbers.
-- **Ternary trees with `double` values**: For more complex hierarchical structures with a higher branching factor.
+To manage these limitations and ensure compatibility, the decision was made to implement three separate TreeWidget classes. This also allowed for customization specific to each data type and tree structure, such as creating wider circles for complex number nodes.
 
-Additionally, we had to use three different classes due to the limitations of working with Qt5. While Qt6 is the latest version, we used Qt5 for this project to ensure compatibility and stability. The need to support different tree structures within the Qt5 framework necessitated the creation of multiple classes. This approach allowed us to effectively manage the limitations and requirements of the Qt5 framework, ensuring that our tree widgets could handle the diverse data types and structures we aimed to implement.
+## Tests Description
+
+The tests are designed to verify the correctness of various operations on the tree classes, including adding nodes and performing different types of traversals. Each test ensures that the tree structure and traversal methods work as expected.
 
 ### Memory Leak Analysis
 
@@ -872,9 +876,39 @@ When running the demo without Qt, no memory leaks were detected:
 
 Despite our efforts to explicitly disconnect signals using `disconnect(renderConnection);` to free the memory, these leaks persisted. However, these issues are inherent to the Qt5 framework and not caused by our implementation.
 
+### Signals in Qt5
+
+The implementation includes the use of signals in Qt5, which are integral for emitting `renderTree` and calling the `handleTreeRender` method. The operator `<<` is utilized in `demo.cpp` as it uses the `TreeWidget` object.
+
+### showTree Method
+
+The `showTree` method is responsible for initiating the tree rendering process. This method effectively calls the `drawTree` method, which is the core function for displaying the tree on the screen.
+
+### Window Management
+
+In this project, three windows are used with different content. When you need to switch the view, you must close the current window to show the next tree. This mechanism helps in managing the visualization of different trees in sequence.
+
+### Static Analyzer
+
+We used static analysis tools like `make tidy` to ensure the code quality. These tools help in detecting potential issues early in the development process, ensuring a more robust implementation.
+
+### makefile and qmake
+
+The project build is managed using `makefile` and `qmake`. The `cpp_ex4_24.pro` file acts as a central collection of project configurations, compiling the `.hpp` and `.cpp` files along with the necessary Qt5 framework `_moc` files.
+
 ### Conclusion
 
-This project demonstrates the implementation of flexible and generic tree structures capable of handling various data types and tree configurations. The comprehensive test suite ensures the correctness of these implementations. The memory leak analysis highlights that the detected leaks are related to the Qt framework and not our code. Future work may focus on further optimizing the code and addressing any Qt-related memory management issues. 
+This project demonstrates the implementation of flexible and generic tree structures capable of handling various data types and tree configurations. The comprehensive test suite ensures the correctness of these implementations. The memory leak analysis highlights that the detected leaks are related to the Qt framework and not our code. Future work may focus on further optimizing the code and addressing any Qt-related memory management issues.
 
-By creating three distinct classes, we managed to cater to the needs of different data types and tree structures within the constraints of the Qt5 framework. This approach not only provided the necessary functionality but also maintained compatibility and stability within the Qt5 environment.
+By creating three distinct TreeWidget classes, we managed to cater to the needs of different data types and tree structures within the constraints of the Qt5 framework. This approach not only provided the necessary functionality but also maintained compatibility and stability within the Qt5 environment.
 
+## Additional Information
+
+- **TreeWidget Object in demo.cpp:** The `<<` operator is used in `demo.cpp` as it uses the `TreeWidget` object.
+- **Qt5 Signals:** The project uses Qt5 signals for emitting `renderTree` and calling `handleTreeRender`.
+- **showTree Method:** The main method for rendering the tree, which calls `drawTree`.
+- **Window Management:** The project displays three windows with different content, which requires closing the current window to show the next tree.
+- **Static Analysis:** Tools like `make tidy` are used for code analysis.
+- **Makefile and qmake:** The `cpp_ex4_24.pro` file compiles `.hpp` and `.cpp` files and includes Qt5 framework `_moc` files.
+
+This comprehensive README provides an overview of the project, the necessity for multiple TreeWidget classes due to Qt5 constraints, and the detailed explanation of the testing, memory analysis, and additional project-specific information.
