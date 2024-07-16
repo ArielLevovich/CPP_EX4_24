@@ -850,9 +850,7 @@ The reason for having three different tree classes (`Tree<double, 2>`, `Tree<Com
 - **Binary trees with `Complex` values**: For applications dealing with complex numbers.
 - **Ternary trees with `double` values**: For more complex hierarchical structures with a higher branching factor.
 
-## Tests Description
-
-The tests are designed to verify the correctness of various operations on the tree classes, including adding nodes and performing different types of traversals. Each test ensures that the tree structure and traversal methods work as expected.
+Additionally, we had to use three different classes due to the limitations of working with Qt5. While Qt6 is the latest version, we used Qt5 for this project to ensure compatibility and stability. The need to support different tree structures within the Qt5 framework necessitated the creation of multiple classes. This approach allowed us to effectively manage the limitations and requirements of the Qt5 framework, ensuring that our tree widgets could handle the diverse data types and structures we aimed to implement.
 
 ### Memory Leak Analysis
 
@@ -872,6 +870,11 @@ When running the demo without Qt, no memory leaks were detected:
 ==2444108==      possibly lost: 0 bytes in 0 blocks
 ```
 
+Despite our efforts to explicitly disconnect signals using `disconnect(renderConnection);` to free the memory, these leaks persisted. However, these issues are inherent to the Qt5 framework and not caused by our implementation.
+
 ### Conclusion
 
-This project demonstrates the implementation of flexible and generic tree structures capable of handling various data types and tree configurations. The comprehensive test suite ensures the correctness of these implementations. The memory leak analysis highlights that the detected leaks are related to the Qt framework and not our code. Future work may focus on further optimizing the code and addressing any Qt-related memory management issues.
+This project demonstrates the implementation of flexible and generic tree structures capable of handling various data types and tree configurations. The comprehensive test suite ensures the correctness of these implementations. The memory leak analysis highlights that the detected leaks are related to the Qt framework and not our code. Future work may focus on further optimizing the code and addressing any Qt-related memory management issues. 
+
+By creating three distinct classes, we managed to cater to the needs of different data types and tree structures within the constraints of the Qt5 framework. This approach not only provided the necessary functionality but also maintained compatibility and stability within the Qt5 environment.
+
