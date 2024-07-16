@@ -713,23 +713,7 @@ private:
 ### Shared Pointer Usage
 In this project, `std::shared_ptr` is used extensively to manage the nodes of the tree. Shared pointers provide automatic memory management and ensure that nodes are deallocated properly when they are no longer needed. This approach helps prevent memory leaks and makes the code more robust and easier to maintain.
 
-### Testing
-Unit tests are written using the Doctest framework to ensure the correctness of the tree implementation and iterators. These tests cover various scenarios, including adding nodes, traversing the tree using different iterators, and converting the tree to a heap.
-
-### Qt GUI Integration
-The project includes a graphical user interface (GUI) to visualize the tree structure. The GUI is implemented using Qt and provides a visual representation of the tree with nodes and edges. The `TreeWidget`, `TreeWidgetComplex2`, and `TreeWidgetDouble3` classes handle the rendering of different types of trees.
-
-### Compilation and Execution
-The project includes a `Makefile` to build the application. The main class (`Demo.cpp`) demonstrates the functionality of the tree implementation and integrates the GUI for visualization.
-
-To compile and run the project:
-1. Run `make` to build the application.
-2. Execute the application using `./cpp_ex4_24`.
-
-The application will display the tree structures in a window, allowing you to visualize the nodes and their connections.
-
 ### Explanation of Using Only Header Files (`.hpp`) for Template Classes (Iterators)
-
 In this project, you will notice that the template classes, particularly the iterators, are defined entirely within header files (`.hpp`). This is a common practice in C++ programming, and here's why:
 
 #### Templates and Compilation
