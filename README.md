@@ -1,11 +1,11 @@
 # README
 
-## Project: k-ary Tree Implementation with Iterators
+## Project: k-ary Tree Implementation with Iterators and GUI
 **Author:** Ariel Levovich  
 **Email:** ariel.levovich@msmail.ariel.ac.il
 
 ### Overview
-This project implements a generic k-ary tree container that can hold keys of any type (e.g., numbers, strings, classes). The default tree is a binary tree (k=2). The implementation includes various tree traversal iterators and a function to convert the tree to a min-heap.
+This project implements a generic k-ary tree container that can hold keys of any type (e.g., numbers, strings, classes). The default tree is a binary tree (k=2). The implementation includes various tree traversal iterators, a function to convert the tree to a min-heap, and a graphical user interface (GUI) to visualize the tree using Qt.
 
 ### Class Hierarchy and Description
 
@@ -75,6 +75,7 @@ The `Node` class represents each node in the tree, holding a value and pointers 
 ```cpp
 template<typename T, size_t K>
 class Node {
+
 private:
     T value;
     std::vector<std::shared_ptr<Node<T,K>>> children;
@@ -277,9 +278,9 @@ public:
 - **Traversal Logic:** Uses a stack to manage traversal in in-order.
 
 #### BFSIterator Class
-The `BFSIterator` traverses the tree level
+The `BFSIterator` traverses the tree
 
--by-level from left to right (Breadth-First Search).
+ level-by-level from left to right (Breadth-First Search).
 
 ```cpp
 template<typename T, size_t K>
@@ -441,60 +442,421 @@ public:
 - **Operator Overloads:** Provides comparison operators and stream insertion for complex numbers.
 - **toString():** Returns the string representation of the complex number.
 
-### Shared Pointer Usage
-The `std::shared_ptr` is used to manage the nodes in the tree. This choice ensures that memory management is handled automatically, preventing memory leaks and dangling pointers. When a `shared_ptr` goes out of scope or is reassigned, the memory it points to is automatically deallocated if no other `shared_ptr` instances are pointing to it. This approach simplifies memory management, especially in complex structures like trees where nodes can have multiple parents and children.
+#### TreeWidget Class
+The `TreeWidget` class visualizes the tree structure using Qt's `QWidget`. It handles rendering the tree on a window.
 
-### Example Usage
 ```cpp
-#include "Tree.hpp"
+#include <QPainter>
+#include <QApplication>
+#include <QEventLoop>
+#include "TreeWidget.hpp"
+
+TreeWidget::TreeWidget(std::shared_ptr<Node<double,2>> rootNode, QWidget* parent)
+    : QWidget(parent), root(rootNode) {
+	    renderConnection = connect(this, &TreeWidget::renderTree, this, &TreeWidget::handleRenderTree);
+    }
+
+TreeWidget::~TreeWidget() {
+    disconnect(renderConnection); // Explicitly disconnect the signal
+}
+
+void TreeWidget::setRoot(std::shared_ptr<Node<double,2>> rootNode) {
+    root = rootNode;
+}
+
+void TreeWidget::paintEvent(QPaintEvent*) {
+    QPainter painter(this);
+    drawTree(painter, root, width() / 2, 30, width() / 4, 50);
+}
+
+void TreeWidget::drawTree(QPainter& painter, std::shared_ptr<Node<double,2>> node, int x, int y, int hSpacing, int vSpacing) {
+    if (!node) return;
+    
+    painter.drawEllipse(x - 15, y - 15, 30, 30);
+    painter.drawText(x - 10, y + 5, QString::number(node->get_value()));
+
+    int numChildren = node->get_children().size();
+    int newX, newY;
+    for (int i = 0; i < numChildren; ++i) {
+        newX = x - (numChildren - 1) * hSpacing / 2 + i * hSpacing;
+        newY = y + vSpacing;
+        painter.drawLine(x, y + 15, newX, newY - 15);
+        drawTree(painter, node->get_children()[i], newX, newY, hSpacing / 2, vSpacing);
+    }
+}
+
+void TreeWidget::handleRenderTree() {
+    show();
+    repaint();
+}
+
+#ifndef TREEWIDGET_H
+#define TREEWIDGET_H
+
+#include <QWidget>
+#include "Node.hpp"
+
+class TreeWidget : public QWidget {
+    Q_OBJECT
+
+public:
+    explicit TreeWidget(std::shared_ptr<Node<double,2>> rootNode, QWidget* parent = nullptr);    
+
+    ~TreeWidget(); // Destructor
+
+    void setRoot(std::shared_ptr<Node<double,2>> rootNode);
+    
+signals:
+    void renderTree(); // Signal to trigger rendering
+
+public slots:
+    void handleRenderTree(); // Slot to handle rendering
+
+protected:
+    void paintEvent(QPaintEvent* event) override;
+
+private:
+    std::shared_ptr<Node<double,2>> root;
+    QMetaObject::Connection renderConnection; // Store the connection
+    static void drawTree(QPainter& painter, std::shared_ptr<Node<double,2>> node, int x, int y, int hSpacing, int vSpacing);
+};
+
+#endif // TREEWIDGET_H
+```
+
+- **Constructor:** Initializes the widget with the root node of the tree.
+- **Destructor:** Explicitly disconnects the render signal.
+- **setRoot(std::shared_ptr<Node<double,2>> rootNode):** Sets the root node for rendering.
+- **paintEvent(QPaintEvent*):** Handles the painting event to draw the tree.
+- **drawTree(QPainter& painter, std::shared_ptr<Node<double,2>> node, int x, int y, int hSpacing, int vSpacing):** Recursively draws the tree nodes and edges.
+- **handleRenderTree():** Slot to handle the render signal and trigger painting.
+
+#### TreeWidgetComplex2 Class
+The `TreeWidgetComplex2` class visualizes a binary tree with `Complex` values using Qt's `QWidget`.
+
+```cpp
+#include <QPainter>
+#include <QApplication>
+#include <QEventLoop>
+#include "TreeWidgetComplex2.hpp"
+
+TreeWidgetComplex2::TreeWidgetComplex2(std::shared_ptr<Node<Complex,2>> rootNode, QWidget* parent)
+    : QWidget(parent), root(rootNode) {
+	    renderConnection = connect(this, &TreeWidgetComplex2::renderTree, this, &TreeWidgetComplex2::handleRenderTree);
+    }
+
+TreeWidgetComplex2::~TreeWidgetComplex2() {
+    disconnect(renderConnection); // Explicitly disconnect the signal
+}
+
+void TreeWidgetComplex2::setRoot(std::shared_ptr<Node<Complex,2>> rootNode) {
+    root = rootNode;
+}
+
+void TreeWidgetComplex2::paintEvent(QPaintEvent*) {
+    QPainter painter(this);
+    drawTree(painter, root, width() / 2, 30, width() / 4, 50);
+}
+
+void TreeWidgetComplex2::drawTree(QPainter& painter, std::shared_ptr<Node<Complex,2>> node, int x, int y, int hSpacing, int vSpacing) {
+    if (!node) return;
+    
+    painter.drawEllipse(x - 20, y - 20, 40, 
+
+40);
+    Complex c = node->get_value();       
+    
+    painter.drawText(x - 10, y + 5, QString(c.toString().c_str()));
+
+    int numChildren = node->get_children().size();
+    int newX, newY;
+    for (int i = 0; i < numChildren; ++i) {
+        newX = x - (numChildren - 1) * hSpacing / 2 + i * hSpacing;
+        newY = y + vSpacing;
+        painter.drawLine(x, y + 20, newX, newY - 20);
+        drawTree(painter, node->get_children()[i], newX, newY, hSpacing / 2, vSpacing);
+    }
+}
+
+void TreeWidgetComplex2::handleRenderTree() {
+    show();
+    repaint();
+}
+
+#ifndef TREEWIDGET_COMPLEX2_H
+#define TREEWIDGET_COMPLEX2_H
+
+#include <QWidget>
+#include "Node.hpp"
 #include "Complex.hpp"
 
-int main() {
-    Tree<int, 2> binary_tree;
-    Node<int, 2> root(1);
-    Node<int, 2> left_child(2);
-    Node<int, 2> right_child(3);
+class TreeWidgetComplex2 : public QWidget {
+    Q_OBJECT
+
+public:
+    explicit TreeWidgetComplex2(std::shared_ptr<Node<Complex,2>> rootNode, QWidget* parent = nullptr);    
+    ~TreeWidgetComplex2(); // Destructor
+    void setRoot(std::shared_ptr<Node<Complex,2>> rootNode);
     
-    binary_tree.add_root(root);
-    binary_tree.add_sub_node(root, left_child);
-    binary_tree.add_sub_node(root, right_child);
-    
-    for (auto it = binary_tree.begin_pre_order(); it != binary_tree.end_pre_order(); ++it) {
-        std::cout << it.get_value() << " ";
+signals:
+    void renderTree(); // Signal to trigger rendering
+
+public slots:
+    void handleRenderTree(); // Slot to handle rendering
+
+protected:
+    void paintEvent(QPaintEvent* event) override;
+
+private:
+    std::shared_ptr<Node<Complex,2>> root;
+    QMetaObject::Connection renderConnection; // Store the connection
+    static void drawTree(QPainter& painter, std::shared_ptr<Node<Complex,2>> node, int x, int y, int hSpacing, int vSpacing);
+};
+
+#endif // TREEWIDGET_COMPLEX2_H
+```
+
+- **Constructor:** Initializes the widget with the root node of the tree.
+- **Destructor:** Explicitly disconnects the render signal.
+- **setRoot(std::shared_ptr<Node<Complex,2>> rootNode):** Sets the root node for rendering.
+- **paintEvent(QPaintEvent*):** Handles the painting event to draw the tree.
+- **drawTree(QPainter& painter, std::shared_ptr<Node<Complex,2>> node, int x, int y, int hSpacing, int vSpacing):** Recursively draws the tree nodes and edges.
+- **handleRenderTree():** Slot to handle the render signal and trigger painting.
+
+#### TreeWidgetDouble3 Class
+The `TreeWidgetDouble3` class visualizes a ternary tree with `double` values using Qt's `QWidget`.
+
+```cpp
+#include <QPainter>
+#include <QApplication>
+#include <QEventLoop>
+#include "TreeWidgetDouble3.hpp"
+
+TreeWidgetDouble3::TreeWidgetDouble3(std::shared_ptr<Node<double,3>> rootNode, QWidget* parent)
+    : QWidget(parent), root(rootNode) {
+	    renderConnection = connect(this, &TreeWidgetDouble3::renderTree, this, &TreeWidgetDouble3::handleRenderTree);
     }
-    std::cout << std::endl;
-    
-    // Complex number demonstration
-    Complex c1(1, 2);
-    Complex c2(3, 4);
-    
-    std::cout << "Complex number c1: " << c1 << std::endl;
-    std::cout << "Complex number c2: " << c2 << std::endl;
 
-    return 0;
+TreeWidgetDouble3::~TreeWidgetDouble3() {
+    disconnect(renderConnection); // Explicitly disconnect the signal
 }
+
+void TreeWidgetDouble3::setRoot(std::shared_ptr<Node<double,3>> rootNode) {
+    root = rootNode;
+}
+
+void TreeWidgetDouble3::paintEvent(QPaintEvent*) {
+    QPainter painter(this);
+    drawTree(painter, root, width() / 2, 30, width() / 4, 50);
+}
+
+void TreeWidgetDouble3::drawTree(QPainter& painter, std::shared_ptr<Node<double,3>> node, int x, int y, int hSpacing, int vSpacing) {
+    if (!node) return;
+    
+    painter.drawEllipse(x - 20, y - 20, 40, 40);
+    painter.drawText(x - 10, y + 5, QString::number(node->get_value()));
+
+    int numChildren = node->get_children().size();
+    int newX, newY;
+    for (int i = 0; i < numChildren; ++i) {
+        newX = x - (numChildren - 1) * hSpacing / 2 + i * hSpacing;
+        newY = y + vSpacing;
+        painter.drawLine(x, y + 20, newX, newY - 20);
+        drawTree(painter, node->get_children()[i], newX, newY, hSpacing / 2, vSpacing);
+    }
+}
+
+void TreeWidgetDouble3::handleRenderTree() {
+    show();
+    repaint();
+}
+
+#ifndef TREEWIDGET_DOUBLE3_H
+#define TREEWIDGET_DOUBLE3_H
+
+#include <QWidget>
+#include "Node.hpp"
+
+class TreeWidgetDouble3 : public QWidget {
+    Q_OBJECT
+
+public:
+    explicit TreeWidgetDouble3(std::shared_ptr<Node<double,3>> rootNode, QWidget* parent = nullptr);    
+    ~TreeWidgetDouble3(); // Destructor
+    void setRoot(std::shared_ptr<Node<double,3>> rootNode);
+    
+signals:
+    void renderTree(); // Signal to trigger rendering
+
+public slots:
+    void handleRenderTree(); // Slot to handle rendering
+
+protected:
+    void paintEvent(QPaintEvent* event) override;
+
+private:
+    std::shared_ptr<Node<double,3>> root;
+    QMetaObject::Connection renderConnection; // Store the connection
+    static void drawTree(QPainter& painter, std::shared_ptr<Node<double,3>> node, int x, int y, int hSpacing, int vSpacing);
+};
+
+#endif // TREEWIDGET_DOUBLE3_H
 ```
 
-### Makefile
-The Makefile should compile the project and run the main program:
-```makefile
-all: tree
+- **Constructor:** Initializes the widget with the root node of the tree.
+- **Destructor:** Explicitly disconnects the render signal.
+- **setRoot(std::shared_ptr<Node<double,3>> rootNode):** Sets the root node for rendering.
+- **paintEvent(QPaintEvent*):** Handles the painting event to draw the tree.
+- **drawTree(QPainter& painter, std::shared_ptr<Node<double,3>> node, int x, int y, int hSpacing, int vSpacing):** Recursively draws the tree nodes and edges.
+- **handleRenderTree():** Slot to handle the render signal and trigger painting.
 
-tree: main.o
-    g++ -o tree main.o
-
-main.o: main.cpp Tree.hpp Complex.hpp
-    g++ -c main.cpp
-
-clean:
-    rm -f *.o tree
-```
-
-### GUI
-For the GUI part of the project, refer to the [Qt for Beginners](https://wiki.qt.io/Qt_for_Beginners) and the [YouTube tutorial](https://www.youtube.com/watch?v=cXojtB8vS2E). The GUI should provide a visual representation of the tree structure.
+### Shared Pointer Usage
+In this project, `std::shared_ptr` is used extensively to manage the nodes of the tree. Shared pointers provide automatic memory management and ensure that nodes are deallocated properly when they are no longer needed. This approach helps prevent memory leaks and makes the code more robust and easier to maintain.
 
 ### Testing
-Comprehensive tests should be written to ensure all functionalities of the tree and iterators work correctly. Use various data types and complex structures to test the robustness of the implementation. 
+Unit tests are written using the Doctest framework to ensure the correctness of the tree implementation and iterators. These tests cover various scenarios, including adding nodes, traversing the tree using different iterators, and converting the tree to a heap.
+
+### Qt GUI Integration
+The project includes a graphical user interface (GUI) to visualize the tree structure. The GUI is implemented using Qt and provides a visual representation of the tree with nodes and edges. The `TreeWidget`, `TreeWidgetComplex2`, and `TreeWidgetDouble3` classes handle the rendering of different types of trees.
+
+### Compilation and Execution
+The project includes a `Makefile` to build the application. The main class (`Demo.cpp`) demonstrates the functionality of the tree implementation and integrates the GUI for visualization.
+
+To compile and run the project:
+1. Run `make` to build the application.
+2. Execute the application using `./cpp_ex4_24`.
+
+The application will display the tree structures in a window, allowing you to visualize the nodes and their connections.
+
+### Explanation of Using Only Header Files (`.hpp`) for Template Classes (Iterators)
+
+In this project, you will notice that the template classes, particularly the iterators, are defined entirely within header files (`.hpp`). This is a common practice in C++ programming, and here's why:
+
+#### Templates and Compilation
+Templates in C++ are a powerful feature that allows for generic programming. However, templates are only instantiated when they are used. This means that the compiler needs to see the entire template definition when it compiles each translation unit that uses the template. By defining the template classes in header files, we ensure that the compiler has access to the full definition whenever it needs to instantiate the template.
+
+#### Header Files (.hpp) for Template Classes
+1. **Visibility:** When a template is used in multiple source files, defining the template in a header file ensures that the template's definition is available in each source file that includes the header. This allows the compiler to instantiate the template with the specific types used in those files.
+  
+2. **Avoiding Linker Errors:** If a template class is defined in a separate source file (.cpp) and only its declaration is in the header file, the compiler won't be able to instantiate the template correctly, leading to linker errors. By defining the template entirely in the header file, we avoid these issues.
+
+3. **Ease of Use:** Keeping the template class definition in the header file makes the code easier to manage and understand. Users of the template class only need to include the header file to use the template, without worrying about linking with additional source files.
+
+#### Example: Iterator Classes
+In this project, all iterator classes (`PreOrderIterator`, `PostOrderIterator`, `InOrderIterator`, `BFSIterator`, `DFSIterator`, `HeapIterator`) are template classes defined within their respective header files. This ensures that any source file including these headers can instantiate the iterators with specific types as needed.
+## README
+
+### Overview of Tests
+
+This project includes a comprehensive suite of tests for the `Tree`, `Node`, and `Complex` classes. The tests verify the correctness of various tree operations, including adding nodes and different tree traversal methods.
+
+### Test Cases
+
+#### Test Case 1: `Test add_root`
+- **Description:** Verifies that a root node can be added to the tree.
+- **Check:** Ensures the root node's value is correctly set.
+
+#### Test Case 2: `Test add_sub_node`
+- **Description:** Verifies that a child node can be added to a parent node.
+- **Check:** Ensures the child node's value is correctly set in the parent node's children.
+
+#### Test Case 3: `Test pre order scan tree<int,2>`
+- **Description:** Verifies the pre-order traversal of a binary tree with integer values.
+- **Check:** Ensures the nodes are visited in the correct pre-order sequence.
+
+#### Test Case 4: `Test post order scan tree<int,2>`
+- **Description:** Verifies the post-order traversal of a binary tree with integer values.
+- **Check:** Ensures the nodes are visited in the correct post-order sequence.
+
+#### Test Case 5: `Test in order scan tree<int,2>`
+- **Description:** Verifies the in-order traversal of a binary tree with integer values.
+- **Check:** Ensures the nodes are visited in the correct in-order sequence.
+
+#### Test Case 6: `Test BFS scan tree<int,2>`
+- **Description:** Verifies the BFS traversal of a binary tree with integer values.
+- **Check:** Ensures the nodes are visited in the correct BFS sequence.
+
+#### Test Case 7: `Test DFS scan tree<int,2>`
+- **Description:** Verifies the DFS traversal of a binary tree with integer values.
+- **Check:** Ensures the nodes are visited in the correct DFS sequence.
+
+#### Test Case 8: `Test Heap scan tree<int,2>`
+- **Description:** Verifies the heap traversal of a binary tree with integer values.
+- **Check:** Ensures the nodes are visited in the correct min-heap sequence.
+
+#### Test Case 9: `Test pre order scan tree<double,3>`
+- **Description:** Verifies the pre-order traversal of a ternary tree with double values.
+- **Check:** Ensures the nodes are visited in the correct pre-order sequence.
+
+#### Test Case 10: `Test post order scan tree<double,3>`
+- **Description:** Verifies the post-order traversal of a ternary tree with double values.
+- **Check:** Ensures the nodes are visited in the correct post-order sequence.
+
+#### Test Case 11: `Test in order scan tree<double,3>`
+- **Description:** Verifies the in-order traversal of a ternary tree with double values.
+- **Check:** Ensures the nodes are visited in the correct in-order sequence.
+
+#### Test Case 12: `Test BFS scan tree<double,3>`
+- **Description:** Verifies the BFS traversal of a ternary tree with double values.
+- **Check:** Ensures the nodes are visited in the correct BFS sequence.
+
+#### Test Case 13: `Test DFS scan tree<double,3>`
+- **Description:** Verifies the DFS traversal of a ternary tree with double values.
+- **Check:** Ensures the nodes are visited in the correct DFS sequence.
+
+#### Test Case 14: `Test Heap scan tree<double,3>`
+- **Description:** Verifies the heap traversal of a ternary tree with double values.
+- **Check:** Ensures the nodes are visited in the correct min-heap sequence.
+
+#### Test Case 15: `Test pre order scan tree<Complex,2>`
+- **Description:** Verifies the pre-order traversal of a binary tree with complex number values.
+- **Check:** Ensures the nodes are visited in the correct pre-order sequence.
+
+#### Test Case 16: `Test post order scan tree<Complex,2>`
+- **Description:** Verifies the post-order traversal of a binary tree with complex number values.
+- **Check:** Ensures the nodes are visited in the correct post-order sequence.
+
+#### Test Case 17: `Test in order scan tree<Complex,2>`
+- **Description:** Verifies the in-order traversal of a binary tree with complex number values.
+- **Check:** Ensures the nodes are visited in the correct in-order sequence.
+
+#### Test Case 18: `Test BFS scan tree<Complex,2>`
+- **Description:** Verifies the BFS traversal of a binary tree with complex number values.
+- **Check:** Ensures the nodes are visited in the correct BFS sequence.
+
+#### Test Case 19: `Test DFS scan tree<Complex,2>`
+- **Description:** Verifies the DFS traversal of a binary tree with complex number values.
+- **Check:** Ensures the nodes are visited in the correct DFS sequence.
+
+#### Test Case 20: `Test Heap scan tree<Complex,2>`
+- **Description:** Verifies the heap traversal of a binary tree with complex number values.
+- **Check:** Ensures the nodes are visited in the correct min-heap sequence.
+
+### Memory Leak Analysis
+
+When running the tests with `valgrind` using the command `make valgrind`, we encountered several memory leaks. These leaks are mainly related to `realloc` and `malloc` calls. The errors were found in various parts of the program, especially related to the usage of Qt:
+
+```
+==3118961==    at 0x484DCD3: realloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==3118961==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+...
+==3118961==    definitely lost: 256 bytes in 1 blocks
+==3118961==    indirectly lost: 32 bytes in 1 blocks
+==3118961==      possibly lost: 1,152 bytes in 3 blocks
+```
+
+These memory leaks are attributed to Qt and not to the logic of our implementation. This was verified by running the demo without using Qt, which resulted in no memory leaks. Attempts to explicitly disconnect signals using `disconnect(renderConnection)` did not resolve the memory leaks.
+
+Summary of memory leaks without Qt:
+```
+==2444108==    definitely lost: 0 bytes in 0 blocks
+==2444108==    indirectly lost: 0 bytes in 0 blocks
+==2444108==      possibly lost: 0 bytes in 0 blocks
+```
 
 ### Conclusion
-This project demonstrates the implementation of a flexible k-ary tree structure with various traversal methods, utilizing modern C++ features like templates and smart pointers to ensure safe and efficient memory management. The example usage and provided GUI guidelines aim to help users visualize and understand the tree's structure and operations.
+
+The test suite comprehensively covers the functionality of the `Tree` and `Node` classes. While the `valgrind` analysis highlighted some memory issues, they are related to Qt and not the implementation itself. Future work should consider further optimization and potential fixes for Qt-related memory management.
+
+This explanation highlights why using header files for template classes is essential in C++ and how it benefits the project by simplifying compilation and avoiding common issues.
+This README provides an overview of the project's structure and functionality. For detailed implementation and usage instructions, refer to the source code and comments within the code files.
