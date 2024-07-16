@@ -816,10 +816,6 @@ This project includes a comprehensive suite of tests for the `Tree`, `Node`, and
 - **Description:** Verifies the heap traversal of a binary tree with complex number values.
 - **Check:** Ensures the nodes are visited in the correct min-heap sequence.
 
-Certainly! Here is the detailed text based on the content from your images and previous information.
-
-### README
-
 ## Overview
 
 This project includes the implementation and testing of various tree structures and nodes. The trees are generic and can handle different data types, such as `int`, `double`, and `Complex`. Each tree type is tested for various traversal methods, ensuring the correctness of the implementation.
