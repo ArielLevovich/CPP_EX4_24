@@ -876,9 +876,9 @@ Despite our efforts to explicitly disconnect signals using `disconnect(renderCon
 
 The implementation includes the use of signals in Qt5, which are integral for emitting `renderTree` and calling the `handleTreeRender` method. The operator `<<` is utilized in `demo.cpp` as it uses the `TreeWidget` object.
 
-### showTree Method
+### repaint() Method
 
-The `showTree` method is responsible for initiating the tree rendering process. This method effectively calls the `drawTree` method, which is the core function for displaying the tree on the screen.
+The `repaint` method is responsible for initiating the tree rendering process. This method effectively calls the `paintEvent()` method, which is the core function for displaying the tree on the screen.
 
 ### Window Management
 
@@ -896,15 +896,15 @@ The project build is managed using `makefile` and `qmake`. The `cpp_ex4_24.pro` 
 
 This project demonstrates the implementation of flexible and generic tree structures capable of handling various data types and tree configurations. The comprehensive test suite ensures the correctness of these implementations. The memory leak analysis highlights that the detected leaks are related to the Qt framework and not our code. Future work may focus on further optimizing the code and addressing any Qt-related memory management issues.
 
-By creating three distinct TreeWidget classes, we managed to cater to the needs of different data types and tree structures within the constraints of the Qt5 framework. This approach not only provided the necessary functionality but also maintained compatibility and stability within the Qt5 environment.
+By creating three distinct `TreeWidget` classes, we managed to cater to the needs of different data types and tree structures within the constraints of the Qt5 framework. This approach not only provided the necessary functionality but also maintained compatibility and stability within the Qt5 environment.
 
 ## Additional Information
 
 - **TreeWidget Object in demo.cpp:** The `<<` operator is used in `demo.cpp` as it uses the `TreeWidget` object.
 - **Qt5 Signals:** The project uses Qt5 signals for emitting `renderTree` and calling `handleTreeRender`.
-- **showTree Method:** The main method for rendering the tree, which calls `drawTree`.
+- **repaint Method:** The main method for rendering the tree, which calls `paintEvent`.
 - **Window Management:** The project displays three windows with different content, which requires closing the current window to show the next tree.
 - **Static Analysis:** Tools like `make tidy` are used for code analysis.
 - **Makefile and qmake:** The `cpp_ex4_24.pro` file compiles `.hpp` and `.cpp` files and includes Qt5 framework `_moc` files.
 
-This comprehensive README provides an overview of the project, the necessity for multiple TreeWidget classes due to Qt5 constraints, and the detailed explanation of the testing, memory analysis, and additional project-specific information.
+---
