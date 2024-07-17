@@ -728,7 +728,6 @@ Templates in C++ are a powerful feature that allows for generic programming. How
 
 #### Example: Iterator Classes
 In this project, all iterator classes (`PreOrderIterator`, `PostOrderIterator`, `InOrderIterator`, `BFSIterator`, `DFSIterator`, `HeapIterator`) are template classes defined within their respective header files. This ensures that any source file including these headers can instantiate the iterators with specific types as needed.
-## README
 
 ### Overview of Tests
 
@@ -847,10 +846,6 @@ The node class templates are designed to work with the tree class templates. Eac
 The reason for having three different TreeWidget classes (`TreeWidget<double, 2>`, `TreeWidget<Complex, 2>`, `TreeWidget<double, 3>`) is due to the limitations and requirements when working with the Qt5 framework. Qt5 expects the presence of corresponding `TreeWidget.cpp` files, which led to complications in implementing a single template class in an `.hpp` file. 
 
 To manage these limitations and ensure compatibility, the decision was made to implement three separate TreeWidget classes. This also allowed for customization specific to each data type and tree structure, such as creating wider circles for complex number nodes.
-
-## Tests Description
-
-The tests are designed to verify the correctness of various operations on the tree classes, including adding nodes and performing different types of traversals. Each test ensures that the tree structure and traversal methods work as expected.
 
 ### Memory Leak Analysis
 
